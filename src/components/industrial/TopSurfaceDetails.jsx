@@ -7,6 +7,14 @@
  * surface during the top-to-front continuity transition.
  */
 
+import {
+  MARK_SIZE,
+  SPOOL_MARK_PATH,
+  WORDMARK_BASELINE_OFFSET,
+  WORDMARK_WIDTH,
+  getBrandBadgeLayout,
+} from './brand-badge-geometry.js';
+
 const lerp = (a, b, t) => a + (b - a) * t;
 
 const quadPoint = (quad, u, v) => {
@@ -101,37 +109,94 @@ function Fastener({ quad, u, v, depth }) {
   );
 }
 
-function BrandPlaque({ quad, depth }) {
-  const plaque = quadRect(quad, .438, .072, .562, .16);
-  const [cx, cy] = quadPoint(quad, .5, .117);
-  const wordmarkStyle = {
-    x: cx,
-    fontFamily: "SignPainter, 'Brush Script MT', 'Segoe Script', cursive",
-    fontSize: 20 * depth,
-    fontWeight: 400,
-    textAnchor: 'middle',
-    textLength: 67 * depth,
-    lengthAdjust: 'spacingAndGlyphs',
-  };
+/**
+ * A recess pressed into the shell. The surface light comes from the upper
+ * left, so a pit takes shadow on its top and left inner walls and catches
+ * light on the bottom and right ones — the opposite of the raised mark and
+ * lettering that sit inside it.
+ */
+function EngravedWell({ rect }) {
+  const [topLeft, topRight, bottomRight, bottomLeft] = rect;
   return (
-    <g className="industrial-brand-plaque" aria-hidden="true">
-      <polygon points={polygonString(plaque)} fill="#D3D1C9" stroke="#92948E" strokeWidth=".9" />
-      <text
-        {...wordmarkStyle}
-        y={cy + 5.2 * depth}
+    <>
+      <polygon points={polygonString(rect)} fill="#CFCDC5" />
+      <path
+        d={`M${pointString(bottomLeft)}L${pointString(topLeft)}L${pointString(topRight)}`}
+        fill="none"
+        stroke="#8B8D86"
+        strokeWidth="1.15"
+      />
+      <path
+        d={`M${pointString(topRight)}L${pointString(bottomRight)}L${pointString(bottomLeft)}`}
+        fill="none"
+        stroke="#F1EEE5"
+        strokeWidth="1.15"
+        opacity=".68"
+      />
+    </>
+  );
+}
+
+/**
+ * The mark, pressed rather than printed. It carries no colour of its own: the
+ * exact two-layer treatment the wordmark uses — a light rim offset up-left,
+ * then the dark face over it — so both wells read as one stamping operation.
+ */
+function BrandMark({ centerX, centerY, size, depth }) {
+  const place = `translate(${(centerX - size / 2).toFixed(2)} ${(centerY - size / 2).toFixed(2)})`
+    + ` scale(${(size / 100).toFixed(5)})`;
+  return (
+    <>
+      <path
+        d={SPOOL_MARK_PATH}
+        fillRule="evenodd"
         fill="#F1EEE5"
         opacity=".72"
-        transform={`translate(${-0.45 * depth} ${-0.55 * depth})`}
-      >
-        spool.
-      </text>
-      <text
-        {...wordmarkStyle}
-        y={cy + 5.2 * depth}
+        transform={`translate(${-0.45 * depth} ${-0.55 * depth}) ${place}`}
+      />
+      <path
+        d={SPOOL_MARK_PATH}
+        fillRule="evenodd"
         fill="#85877F"
-      >
-        spool.
-      </text>
+        transform={place}
+      />
+    </>
+  );
+}
+
+function BrandPlaque({ quad, depth }) {
+  const badge = getBrandBadgeLayout();
+  const markWell = quadRect(quad, badge.markWell.u0, badge.v0, badge.markWell.u1, badge.v1);
+  const wordWell = quadRect(quad, badge.wordWell.u0, badge.v0, badge.wordWell.u1, badge.v1);
+  const [markX, markY] = quadPoint(quad, badge.markCenterU, badge.midV);
+  const [wordX, wordY] = quadPoint(quad, badge.wordCenterU, badge.midV);
+
+  return (
+    <g className="industrial-brand-plaque" aria-hidden="true">
+      <EngravedWell rect={markWell} />
+      <EngravedWell rect={wordWell} />
+
+      <BrandMark centerX={markX} centerY={markY} size={MARK_SIZE * depth} depth={depth} />
+
+      {[{ fill: '#F1EEE5', op: '.72', dx: -0.45 * depth, dy: -0.55 * depth },
+        { fill: '#85877F', op: '1', dx: 0, dy: 0 }].map((layer, index) => (
+        <text
+          key={index}
+          x={wordX}
+          y={wordY + WORDMARK_BASELINE_OFFSET * depth}
+          fontFamily="SignPainter, 'Brush Script MT', 'Segoe Script', cursive"
+          fontSize={20 * depth}
+          fontWeight={400}
+          textAnchor="middle"
+          textLength={WORDMARK_WIDTH * depth}
+          lengthAdjust="spacingAndGlyphs"
+          fill={layer.fill}
+          opacity={layer.op}
+          transform={`translate(${layer.dx} ${layer.dy})`}
+        >
+          spool.
+        </text>
+      ))}
     </g>
   );
 }

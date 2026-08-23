@@ -243,3 +243,27 @@ source of truth for both the SVG and the PNG output. Change the geometry or the
 palette there and re-run it; never hand-edit `public/favicon.svg`,
 `public/icon.svg`, `public/mark.svg`, or the rasters, or the vector and raster
 forms will drift apart.
+
+### Brand badge on the shell — v1.0
+
+The mark and the wordmark do not share a plaque. Each occupies its own pressed
+well, the way a Macintosh badge separates the logo recess from the name recess.
+This is structural, not stylistic: both wells are built from one `BADGE_V0` /
+`BADGE_V1` pair, so their top and bottom edges are the same edges and the two
+halves cannot drift apart vertically. An earlier attempt put both inside a
+single plaque and centred each by hand; the mark rode visibly high, and no
+amount of tuning fixed it because nothing held the two to a common line.
+
+The wells are recesses and their contents are raised. Surface light comes from
+the upper left throughout this file, so a well takes shadow `#8B8D86` on its
+top and left inner walls and highlight `#F1EEE5` at .68 on its bottom and
+right, while the mark and the lettering keep the raised treatment — a light rim
+offset `(-0.45, -0.55) × depth` under a `#85877F` face. The mark carries no
+colour of its own; it is the same stamping operation as the wordmark.
+
+Layout lives in `src/components/industrial/brand-badge-geometry.js` and is
+covered by `tests/brand-badge-layout.test.mjs`, which asserts that the wells
+share a v-span, that both halves sit on `midV`, that the badge centres on
+u = .5, that each half centres in its own well, and that the pressed path still
+equals `public/mark.svg`. Do not move these numbers back into the renderer —
+the test checks for that too.
