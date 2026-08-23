@@ -1,0 +1,97 @@
+/* Phase 01 blockout —— 全新样式，不迁移任何旧 CSS。 */
+:root {
+  --hud-bg: rgba(18, 18, 20, .88);
+  --hud-fg: #E8E7E2;
+  --hud-dim: #8B8A90;
+  --hud-hi: #FF5C2B;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; overflow: hidden; }
+body { background: #DCDAD3; font-family: var(--mono); }
+
+.stage { position: relative; height: 100%; overflow: hidden; }
+.stage canvas { display: block; }
+
+.hud {
+  /* 只读面板不该吃点击 —— 卡带就浮在它下面，拦住的话根本抓不起来 */
+  pointer-events: none;
+  /* 卡带现在浮在机身前方（顶视时位于画面下部），所以面板回到左上。
+     哪边空取决于卡带停在哪边 —— 这两者要一起改，否则又会挡住抓取。 */
+  position: absolute; left: 20px; top: 20px;
+  background: var(--hud-bg); color: var(--hud-fg);
+  padding: 14px 16px; border-radius: 4px;
+  font-size: 11px; letter-spacing: .04em; min-width: 236px;
+}
+.hud-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.hud-row button, .hud .eject { pointer-events: auto; }
+.hud-row button {
+  flex: 1; font: inherit; font-size: 9.5px; letter-spacing: .06em;
+  padding: 7px 4px; cursor: pointer;
+  background: transparent; color: var(--hud-dim);
+  border: 1px solid #3A3A42; border-radius: 3px;
+}
+.hud-row button.on { color: #fff; border-color: var(--hud-hi); background: rgba(255,92,43,.16); }
+.hud-row button:focus-visible { outline: 2px solid var(--hud-hi); outline-offset: 2px; }
+
+.hud-read { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; margin: 0; }
+.hud-read dt { color: var(--hud-dim); }
+.hud-read dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.hud-read dd.hi { color: var(--hud-hi); }
+.hud-read dd span { color: var(--hud-dim); font-size: 9px; }
+
+.tag {
+  position: absolute; left: 20px; bottom: 18px;
+  pointer-events: none;
+  font-size: 9.5px; letter-spacing: .16em; color: #7A7973;
+}
+
+/* 探针模式下隐藏 HUD —— 它是 DOM 覆盖层，不属于渲染结果。
+   不隐藏的话「两帧机身逐像素一致」会被 HUD 上变化的读数干扰。 */
+.probing .hud,
+.probing .tag { display: none; }
+
+.hud .eject {
+  width: 100%; margin: 0 0 11px; padding: 8px;
+  font: inherit; font-size: 10px; letter-spacing: .1em; cursor: pointer;
+  background: rgba(255,92,43,.16); color: #FF5C2B;
+  border: 1px solid #FF5C2B; border-radius: 3px;
+  transition: scale 150ms ease-out;
+}
+.hud .eject:active { scale: .97; }
+@media (prefers-reduced-motion: reduce) { .hud .eject { transition: none; } }
+
+.eject-control {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  z-index: 4;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(17, 17, 19, 0.32);
+  border-radius: 50%;
+  background: rgba(237, 235, 231, 0.78);
+  color: #E33B0C;
+  box-shadow: 0 8px 20px rgba(17, 17, 19, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  cursor: pointer;
+  font: 18px/1 var(--mono);
+  backdrop-filter: blur(8px);
+  transition: transform 160ms ease-out, background-color 160ms ease-out, color 160ms ease-out;
+}
+.eject-control:hover { background: #111113; color: #E33B0C; }
+.eject-control:active { transform: scale(0.97); }
+.eject-control:focus-visible { outline: 2px solid #E33B0C; outline-offset: 4px; }
+.stage-mark {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  pointer-events: none;
+  color: rgba(17, 17, 19, 0.62);
+  font: 10px/1 var(--mono);
+  letter-spacing: 0.18em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eject-control { transition: none; }
+}

@@ -1,0 +1,984 @@
+.reference-front {
+  --take-font: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --take-ink: #E9E9E3;
+  --take-light: #DEDED6;
+  --take-grey: #8E8E88;
+  --take-dim: #3E3E3A;
+  --take-hair: #242420;
+  --take-tape: #D8D9D0;
+  --take-amber: #C87F2E;
+  --take-red: #E8402A;
+  --take-blue: #7C9AB8;
+  --take-tan: #A2783F;
+  --take-wave-past: #000000;
+  --take-wave-future: #9C9C94;
+  --take-wave-axis: rgb(0 0 0 / .26);
+  font-family: var(--take-font);
+  --front-ink: #17181b;
+  --front-paper: #eeece4;
+  --front-blue: #4b61a8;
+  --front-orange: #f05a2d;
+  --front-focus: #d8e7ff;
+  --front-engrave: #868983;
+  --front-engrave-highlight: #f3f0e7;
+  /* Reference palette: Mark is orange, Return is paper, and the future key is black. */
+  --front-toggle-key-idle: var(--front-paper);
+  --front-toggle-key-active: var(--front-orange);
+  --front-toggle-key-disabled: #4b4b49;
+  --front-toggle-key-mark: #f15b2a;
+  --front-toggle-key-mark-active: #ff6d39;
+  --front-toggle-key-black: #262727;
+  --front-toggle-key-black-sidewall: #111313;
+  /* Seam hierarchy: mechanical lock > control edge > product shell. */
+  --front-seam-strong: #2b2b2b;
+  --front-seam-control: #5c605b;
+  --front-seam-soft: #a9aaa4;
+  --front-seam-screen: #4c4e51;
+  --front-seam-divider: rgb(45 47 44 / .28);
+  /* Compatibility aliases for existing and future front-stage selectors. */
+  --front-shell-edge: var(--front-seam-soft);
+  --front-shell-shadow: #111315;
+  --front-toggle-sidewall: color-mix(in oklch, var(--front-paper) 44%, var(--front-ink));
+  --front-toggle-sidewall-edge: var(--front-seam-control);
+  --front-screen-edge: var(--front-seam-screen);
+  --front-divider: var(--front-seam-divider);
+  --front-hairline: 1px;
+  --front-screw-face: #b9b8b1;
+  --front-screw-slot: #5d615c;
+}
+
+@media only screen and (min-resolution: 192dpi),
+  only screen and (min-device-pixel-ratio: 2) {
+  .reference-front { --front-hairline: .5px; }
+}
+
+.reference-front__physical-body,
+.reference-front__screen-zone,
+.reference-front__lower-fascia {
+  pointer-events: none;
+}
+
+.reference-front__body-shell,
+.reference-front__body-inset,
+.reference-front__body-brush,
+.reference-front__screen-well,
+.reference-front__screen-grid,
+.reference-front__fascia-surface,
+.reference-front__fascia-highlight,
+.reference-front__screw-ring,
+.reference-front__screw-face,
+.reference-front__screw-slot,
+.reference-front__fascia-divider {
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__body-shell { stroke: var(--front-seam-soft); }
+.reference-front__body-inset { stroke: color-mix(in oklch, var(--front-seam-soft) 78%, black); }
+.reference-front__body-brush { opacity: .3; }
+.reference-front__screen-well { stroke: var(--front-seam-screen); }
+.reference-front__fascia-surface { stroke: var(--front-seam-soft); }
+.reference-front__fascia-highlight { fill: none; }
+.reference-front__screw-ring { stroke: color-mix(in oklch, var(--front-seam-soft) 72%, black); }
+.reference-front__screw-face { fill: var(--front-screw-face); }
+.reference-front__screw-slot { stroke: var(--front-screw-slot); }
+.reference-front__fascia-divider {
+  fill: none;
+  stroke: var(--front-divider);
+  stroke-width: var(--front-hairline);
+  stroke-linecap: round;
+}
+
+.reference-front__screen-zone {
+  isolation: isolate;
+}
+
+/* Phase 1 screen shell: the reference is a three-column instrument surface,
+   not three unrelated cards. Keep the boundary quiet so the signal remains
+   the dominant visual layer. */
+.reference-front__shape-panel,
+.reference-front__right-rail,
+.reference-front__waveform {
+  isolation: isolate;
+}
+
+.reference-front__screen-module-well,
+.reference-front__shape-marker,
+.reference-front__shape-curve,
+.reference-front__screen-status {
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__shape-curve {
+  pointer-events: none;
+}
+
+.reference-front__screen-status {
+  pointer-events: none;
+  transition: opacity 90ms cubic-bezier(.23, 1, .32, 1), fill 240ms ease;
+}
+
+.reference-front__screen-status-value {
+  font-variant-numeric: tabular-nums;
+  opacity: .78;
+}
+
+.reference-front__waveform {
+  isolation: isolate;
+}
+
+.reference-front__waveform-well,
+.reference-front__waveform-lane,
+.reference-front__waveform-surface,
+.reference-front__waveform-divider,
+.reference-front__channel-label {
+  pointer-events: none;
+}
+
+.reference-front__waveform-well,
+.reference-front__waveform-surface,
+.reference-front__waveform-divider {
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__screen-well {
+  fill: #000;
+  stroke: var(--take-hair);
+  stroke-width: 1;
+}
+
+.reference-front__waveform-well {
+  fill: #000;
+  stroke: none;
+}
+
+.reference-front__waveform text,
+.reference-front__waveform .reference-front__take-number,
+.reference-front__waveform .reference-front__take-title,
+.reference-front__waveform .reference-front__take-stereo,
+.reference-front__waveform .reference-front__take-input-label,
+.reference-front__waveform .reference-front__channel-label,
+.reference-front__waveform .take-cue-time,
+.reference-front__waveform .take-time-elapsed,
+.reference-front__waveform .take-time-remain {
+  font-family: var(--take-font);
+  font-variant-numeric: tabular-nums;
+}
+
+.reference-front__take-number {
+  font-weight: 200;
+  letter-spacing: .02em;
+}
+
+.reference-front__take-number--light { fill: var(--take-light); }
+.reference-front__take-number--blue { fill: var(--take-blue); }
+.reference-front__take-number--tan { fill: var(--take-tan); }
+
+.reference-front__take-title {
+  fill: var(--take-ink);
+  font-weight: 300;
+  letter-spacing: .16em;
+}
+
+.reference-front__take-stereo {
+  fill: var(--take-blue);
+  font-weight: 300;
+  letter-spacing: .22em;
+}
+
+.reference-front__take-input-label {
+  fill: var(--take-dim);
+  font-weight: 300;
+  letter-spacing: .20em;
+  transition: fill 200ms ease;
+}
+
+.reference-front__waveform[data-transport-state='playing'] .reference-front__take-input-label {
+  fill: var(--take-grey);
+}
+
+.take-input-terminal {
+  stroke: none;
+}
+
+.take-input-terminal--plus { fill: var(--take-red); }
+.take-input-terminal--minus { fill: #57574F; }
+
+.take-wave-lane {
+  fill: var(--take-tape);
+  stroke: none;
+}
+
+.take-wave-axis {
+  fill: none;
+  stroke: var(--take-wave-axis);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.take-channel-tag rect {
+  fill: var(--take-tape);
+}
+
+.reference-front__channel-label {
+  fill: #6E6E68;
+  font-weight: 300;
+  letter-spacing: .14em;
+}
+
+.take-cue {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms cubic-bezier(.23, 1, .32, 1);
+}
+
+.take-cue--a { color: var(--take-amber); }
+.take-cue--b { color: var(--take-ink); }
+
+.take-cue-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.take-cue-node {
+  fill: #000;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.take-cue-node-hit {
+  fill: currentColor;
+  opacity: 0;
+  vector-effect: non-scaling-stroke;
+  transition: opacity 200ms ease;
+}
+
+.take-cue[data-hit='true'] .take-cue-node-hit {
+  opacity: 1;
+  transition: opacity 60ms linear;
+}
+
+.take-cue-time {
+  fill: currentColor;
+  font-weight: 200;
+  letter-spacing: .08em;
+}
+
+.take-cue-legend-dot {
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.take-cue-legend-dot--a {
+  stroke: var(--take-amber);
+}
+
+.take-cue-legend-dot--b {
+  stroke: var(--take-ink);
+}
+
+.take-cue-legend-label {
+  font-weight: 300;
+}
+
+.take-cue-legend-label--a { fill: var(--take-amber); }
+.take-cue-legend-label--b { fill: var(--take-ink); }
+
+.take-playhead {
+  pointer-events: none;
+}
+
+.take-playhead-line {
+  fill: none;
+  stroke: var(--take-ink);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.take-playhead-tip {
+  fill: var(--take-ink);
+  stroke: none;
+}
+
+.take-time-elapsed {
+  fill: var(--take-ink);
+  font-weight: 200;
+  letter-spacing: .08em;
+}
+
+.take-time-remain {
+  fill: var(--take-grey);
+  font-weight: 200;
+  letter-spacing: .10em;
+}
+
+.reference-front__take-number,
+.reference-front__take-title {
+  font-variant-numeric: tabular-nums;
+  font-weight: 300;
+}
+
+.reference-front__right-rail-separator {
+  fill: none;
+  stroke: var(--front-seam-divider);
+  stroke-width: var(--front-hairline);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+/* Screen transport rail: this follows the pasted reference HTML's compact
+   deck / states / shuttle / volume rhythm. It is deliberately separate from
+   the lower physical control fascia. */
+.reference-front__tape-transport,
+.reference-front__tape-deck,
+.reference-front__tape-reel,
+.reference-front__tape-path,
+.reference-front__tape-states,
+.reference-front__screen-shuttle,
+.reference-front__screen-volume {
+  pointer-events: none;
+}
+
+.reference-front__tape-reel-needle {
+  transform-box: fill-box;
+  transform-origin: center;
+  /* In the SVG screen coordinate system, 0deg -> 360deg moves the top of
+     the needle toward the right first: explicit clockwise motion around the
+     black center pivot. */
+  animation: reference-front-reel-spin-clockwise var(--reel-duration, 1.8s) linear infinite;
+  animation-direction: normal;
+  animation-play-state: var(--reel-play-state, paused);
+}
+
+.reference-front__tape-reel-white-disc,
+.reference-front__tape-reel-center {
+  pointer-events: none;
+}
+
+.reference-front__tape-reel-pack,
+.reference-front__tape-path {
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__tape-path {
+  fill: none;
+  stroke: #4A4A44;
+  stroke-width: 1;
+}
+
+.reference-front__screen-shuttle-glyphs {
+  transition: fill 180ms ease;
+}
+
+@keyframes reference-front-reel-spin-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.reference-front__channel-label {
+  font-variant-numeric: tabular-nums;
+}
+
+.reference-front__lower-fascia {
+  isolation: isolate;
+}
+
+.reference-front__parameter-zone,
+.reference-front__transport-zone,
+.reference-front__action-zone {
+  isolation: isolate;
+}
+
+.reference-front__hardware-label,
+.reference-front__engraved-label {
+  paint-order: stroke fill;
+  stroke: var(--front-engrave-highlight);
+  stroke-width: .28px;
+}
+
+.reference-front__hardware-label {
+  fill: var(--front-ink);
+  opacity: .9;
+}
+
+.reference-front [role='button'],
+.reference-front [role='slider'] {
+  cursor: pointer;
+  outline: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.reference-front [role='slider'] {
+  touch-action: none;
+}
+
+.reference-front__semantic-control {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  font: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reference-front__semantic-host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.reference-front__semantic-control:focus-visible {
+  outline: 2px solid var(--front-focus);
+  outline-offset: 2px;
+  filter: drop-shadow(0 0 3px rgb(216 231 255 / 0.32));
+}
+
+.reference-front__semantic-control:disabled {
+  cursor: not-allowed;
+  filter: saturate(.3);
+}
+
+.reference-front__semantic-button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+}
+
+.reference-front__semantic-button[data-visual='dial'] {
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+}
+
+.reference-front__semantic-button[data-visual='dial']:active {
+  transform: none;
+}
+
+.reference-front__semantic-button:active {
+  /* The HTML layer is only a transparent hit target; it must not move under
+     the pointer because the SVG hardware layer owns the pressed feedback. */
+  transform: none;
+}
+
+.reference-front__semantic-range {
+  appearance: none;
+  -webkit-appearance: none;
+  accent-color: var(--front-orange);
+  touch-action: none;
+}
+
+.reference-front__semantic-range::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.reference-front__semantic-range::-webkit-slider-thumb {
+  width: 44px;
+  height: 44px;
+  opacity: 0;
+  -webkit-appearance: none;
+}
+
+.reference-front__semantic-range::-moz-range-track {
+  background: transparent;
+}
+
+.reference-front__semantic-range::-moz-range-thumb {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+}
+
+.reference-front__semantic-range--vertical {
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+
+.reference-front__engraved-label {
+  fill: var(--front-engrave);
+  opacity: .92;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reference-front__semantic-control:hover,
+  .reference-front__transport:hover,
+  .reference-front__knob:hover,
+  .reference-front__shuttle:hover,
+  .reference-front__volume-slider:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.reference-front__transport,
+.reference-front__knob,
+.reference-front__shuttle,
+.reference-front__volume-slider {
+  transition: transform 140ms cubic-bezier(.2, .8, .2, 1), filter 140ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.reference-front__play-dial {
+  isolation: isolate;
+  pointer-events: none;
+  transition: filter 140ms cubic-bezier(.2, .8, .2, 1), opacity 140ms ease;
+}
+
+.reference-front__play-dial-ring {
+  fill: none;
+  stroke: var(--front-seam-strong);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__play-dial-face {
+  fill: var(--front-paper);
+  stroke: none;
+}
+
+.reference-front__play-dial-grip {
+  transform: rotate(var(--play-dial-angle, 0deg));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 280ms cubic-bezier(.32, .72, 0, 1);
+  will-change: transform;
+}
+
+.reference-front__play-dial-handle {
+  fill: var(--front-paper);
+  stroke: #ffffff;
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__play-dial-foot {
+  fill: #080808;
+  opacity: 1;
+}
+
+.reference-front__play-dial-indicator-glow {
+  fill: var(--front-green, #6ca26f);
+  opacity: 0;
+  filter: drop-shadow(0 0 1.5px rgb(108 162 111 / .5));
+  transition: opacity 160ms ease;
+}
+
+.reference-front__play-dial-indicator {
+  fill: #6e6e6e;
+  transition: fill 160ms ease;
+}
+
+.reference-front__play-dial[data-playing='true'] .reference-front__play-dial-indicator {
+  fill: var(--front-green, #6ca26f);
+}
+
+.reference-front__play-dial[data-playing='true'] .reference-front__play-dial-indicator-glow {
+  opacity: .18;
+}
+
+.reference-front__play-dial.is-disabled {
+  filter: saturate(.3);
+  opacity: .72;
+}
+
+.reference-front__transport:has(+ foreignObject .reference-front__semantic-button[data-state='hover']),
+.reference-front__knob:has(+ foreignObject .reference-front__semantic-range[data-state='hover']),
+.reference-front__shuttle:has(+ foreignObject .reference-front__semantic-range[data-state='hover']),
+.reference-front__volume-slider:has(+ foreignObject .reference-front__semantic-range[data-state='hover']) {
+  filter: drop-shadow(0 0 4px rgb(216 231 255 / 0.28)) brightness(1.045);
+}
+
+.reference-front__transport:has(+ foreignObject .reference-front__semantic-button[data-state='pressed']),
+.reference-front__transport:has(+ foreignObject .reference-front__semantic-button:active),
+.reference-front__knob:has(+ foreignObject .reference-front__semantic-range[data-state='pressed']) {
+  /* A group transform scales from the SVG origin unless explicitly managed;
+     the old scale was the source of the visible left/up jump. A real press
+     is represented by a small vertical travel and the existing shadow. */
+  transform: translateY(1px);
+}
+
+.reference-front__volume-slider:has(+ foreignObject .reference-front__semantic-range[data-state='pressed']) {
+  filter: brightness(.985) drop-shadow(0 1px 1px rgb(0 0 0 / 0.16));
+}
+
+.reference-front__transport:has(+ foreignObject .reference-front__semantic-button[data-state='focused']),
+.reference-front__knob:has(+ foreignObject .reference-front__semantic-range[data-state='focused']),
+.reference-front__shuttle:has(+ foreignObject .reference-front__semantic-range[data-state='focused']),
+.reference-front__volume-slider:has(+ foreignObject .reference-front__semantic-range[data-state='focused']) {
+  filter: drop-shadow(0 0 4px rgb(216 231 255 / 0.4));
+}
+
+.reference-front__play-dial:has(+ foreignObject .reference-front__semantic-button[data-visual='dial'][data-state='hover']) {
+  filter: brightness(1.035);
+}
+
+.reference-front__play-dial:has(+ foreignObject .reference-front__semantic-button[data-visual='dial'][data-state='focused']) {
+  filter: brightness(1.05);
+}
+
+.reference-front__transport.is-active rect:nth-child(2) {
+  filter: brightness(1.08);
+}
+
+.reference-front__toggle-key-sidewall {
+  fill: var(--front-toggle-sidewall);
+  stroke: var(--front-toggle-sidewall-edge);
+  stroke-width: .8;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-idle);
+  stroke: var(--front-seam-control);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__toggle-key[data-tone='orange'] .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-mark);
+  stroke: color-mix(in oklch, var(--front-toggle-key-mark) 72%, black);
+}
+
+.reference-front__toggle-key[data-tone='paper'] .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-idle);
+}
+
+.reference-front__toggle-key[data-tone='black'] .reference-front__toggle-key-sidewall {
+  fill: var(--front-toggle-key-black-sidewall);
+  stroke: #070808;
+}
+
+.reference-front__toggle-key[data-tone='black'] .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-black);
+  stroke: #080909;
+}
+
+.reference-front__toggle-key[data-tone='black'] .reference-front__toggle-key-highlight {
+  stroke: #555856;
+  opacity: .36;
+}
+
+.reference-front__toggle-key-highlight {
+  fill: none;
+  stroke: var(--front-engrave-highlight);
+  stroke-width: 1.1;
+  opacity: .58;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__toggle-key-indicator {
+  fill: #b5b5af;
+  transition: fill 160ms ease, opacity 160ms ease;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__toggle-key {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: filter 140ms cubic-bezier(.2, .8, .2, 1), opacity 140ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reference-front__toggle-key:has(+ foreignObject .reference-front__semantic-button[data-state='hover']) {
+    filter: drop-shadow(0 0 3px rgb(216 231 255 / .24)) brightness(1.04);
+  }
+}
+
+.reference-front__toggle-key:has(+ foreignObject .reference-front__semantic-button[data-state='pressed']),
+.reference-front__toggle-key:has(+ foreignObject .reference-front__semantic-button:active) {
+  /* Keep the semantic hit target fixed; depth is communicated by tone and shadow. */
+  transform: none;
+  filter: brightness(.985) drop-shadow(0 1px 1px rgb(0 0 0 / .16));
+}
+
+.reference-front__toggle-key.is-active .reference-front__toggle-key-indicator {
+  fill: var(--front-orange);
+  filter: drop-shadow(0 0 2.5px rgb(240 90 45 / .7));
+}
+
+.reference-front__toggle-key.is-active .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-active);
+}
+
+.reference-front__toggle-key[data-tone='orange'].is-active .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-mark-active);
+}
+
+.reference-front__toggle-key[data-tone='paper'].is-active .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-idle);
+}
+
+.reference-front__toggle-key[data-tone='black'].is-active .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-black);
+}
+
+.reference-front__toggle-key.is-disabled .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-disabled);
+  stroke: color-mix(in oklch, var(--front-toggle-key-disabled) 78%, black);
+}
+
+/* Disabled is communicated by the neutral LED and reduced group emphasis;
+   the three physical key colors remain legible in the resting layout. */
+.reference-front__toggle-key[data-tone='orange'].is-disabled .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-mark);
+  stroke: color-mix(in oklch, var(--front-toggle-key-mark) 72%, black);
+}
+
+.reference-front__toggle-key[data-tone='paper'].is-disabled .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-idle);
+  stroke: var(--front-seam-control);
+}
+
+.reference-front__toggle-key[data-tone='black'].is-disabled .reference-front__toggle-key-face {
+  fill: var(--front-toggle-key-black);
+  stroke: #080909;
+}
+
+.reference-front__toggle-key[data-tone='orange'].is-active .reference-front__toggle-key-indicator {
+  fill: var(--front-orange);
+}
+
+.reference-front__toggle-key[data-tone='paper'].is-active .reference-front__toggle-key-indicator {
+  fill: var(--front-orange);
+}
+
+.reference-front__toggle-key[data-tone='black'].is-active .reference-front__toggle-key-indicator {
+  fill: var(--front-blue);
+}
+
+.reference-front__toggle-key.is-disabled .reference-front__toggle-key-indicator {
+  fill: #b5b5af;
+}
+
+.reference-front__knob.is-active {
+  filter: brightness(1.04) drop-shadow(0 0 3px rgb(85 120 208 / .2));
+}
+
+.reference-front__transport.is-disabled,
+.reference-front__knob.is-disabled,
+.reference-front__shuttle.is-disabled,
+.reference-front__volume-slider.is-disabled {
+  filter: saturate(.3);
+  opacity: .72;
+}
+
+.reference-front__volume-slider {
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.reference-front__volume-slider-track {
+  fill: none;
+  stroke: #b7b9b5;
+  stroke-width: 6;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__volume-slider-thumb {
+  fill: #f3f2ed;
+  stroke: #e0ded7;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__volume-slider-disc {
+  fill: #e8e7e2;
+  stroke: #eeece7;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__volume-icon {
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.reference-front__shuttle-icon {
+  pointer-events: none;
+}
+
+/* Task 03A: Tone is a dedicated control, not a visual variation of the
+   other processing dials. The gray open arc is always visible; scrolling
+   fills the arc from left to right and moves one colored value marker. */
+.reference-front__tone-dial {
+  isolation: isolate;
+  pointer-events: none;
+  transition: filter 145ms ease, opacity 145ms ease;
+}
+
+.reference-front__tone-dial-track {
+  fill: none;
+  stroke-width: 5;
+  stroke-linecap: butt;
+  vector-effect: non-scaling-stroke;
+  stroke: #b7b7b0;
+}
+
+.reference-front__tone-dial-progress {
+  fill: none;
+  stroke: var(--dial-accent, var(--front-orange));
+  stroke-width: 5;
+  stroke-linecap: butt;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transition: opacity 145ms ease;
+}
+
+.reference-front__tone-dial-shadow {
+  fill: rgb(23 24 27 / .18);
+  filter: blur(2.5px);
+}
+
+.reference-front__tone-dial-body {
+  fill: #f3f1e9;
+  stroke: #e5e3da;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 2px 2px rgb(23 24 27 / .18));
+}
+
+.reference-front__tone-dial-indicator {
+  fill: var(--dial-accent, var(--front-orange));
+  opacity: 1;
+}
+
+.reference-front__tone-dial[data-state='hover'],
+.reference-front__tone-dial[data-state='focused'] {
+  filter: brightness(1.025);
+}
+
+.reference-front__tone-dial[data-progress-visible='visible'] .reference-front__tone-dial-progress {
+  opacity: 1;
+}
+
+.reference-front__tone-dial[data-state='focused'] {
+  filter: drop-shadow(0 0 2px rgb(241 91 42 / .25));
+}
+
+.reference-front__tone-dial[data-state='pressed'] {
+  filter: brightness(1.015);
+}
+
+.reference-front__tone-dial.is-disabled,
+.reference-front__tone-dial[data-state='disabled'] {
+  opacity: .62;
+  filter: saturate(.35);
+}
+
+.reference-front__tone-dial.is-disabled .reference-front__tone-dial-progress,
+.reference-front__tone-dial[data-state='disabled'] .reference-front__tone-dial-progress {
+  opacity: 0;
+}
+
+.reference-front__tone-dial-input {
+  opacity: 0;
+  cursor: ns-resize;
+}
+
+.reference-front__tone-dial-input:hover,
+.reference-front__tone-dial-input:focus-visible {
+  filter: none;
+}
+
+.reference-front__tone-dial-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.reference-front__transport:has(+ foreignObject .reference-front__semantic-button[data-state='hover']) .reference-front__engraved-label,
+.reference-front__transport:has(+ foreignObject .reference-front__semantic-button[data-state='focused']) .reference-front__engraved-label {
+  fill: var(--front-ink);
+  opacity: 1;
+}
+
+.reference-front__eject-key {
+  isolation: isolate;
+}
+
+.reference-front__eject-sidewall,
+.reference-front__eject-face {
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__eject-sidewall {
+  fill: var(--front-toggle-sidewall);
+  stroke: var(--front-toggle-sidewall-edge);
+  stroke-width: .8;
+}
+
+.reference-front__eject-face {
+  fill: var(--front-toggle-key-idle);
+  stroke: var(--front-seam-control);
+  stroke-width: 1;
+}
+
+.reference-front__eject-highlight {
+  fill: none;
+  stroke: var(--front-engrave-highlight);
+  stroke-width: 1.1;
+  opacity: .58;
+  vector-effect: non-scaling-stroke;
+}
+
+.reference-front__eject-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 110ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.reference-front__eject-key:has(+ foreignObject .reference-front__semantic-button[data-state='pressed']),
+.reference-front__eject-key:has(+ foreignObject .reference-front__semantic-button:active) {
+  filter: brightness(.985);
+}
+
+.reference-front__eject-key.is-pressed .reference-front__eject-mark {
+  transform: translateY(-1px);
+}
+
+.reference-front__eject-key.is-disabled {
+  filter: saturate(.3);
+  opacity: .7;
+}
+
+.reference-front__eject-key {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: filter 110ms cubic-bezier(.2, .8, .2, 1), opacity 110ms ease-out;
+}
+
+.reference-front text {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-front__tape-reel-needle {
+    animation: none;
+  }
+  .reference-front__transport,
+  .reference-front__toggle-key,
+  .reference-front__toggle-key-indicator,
+  .reference-front__knob,
+  .reference-front__tone-dial,
+  .reference-front__shuttle,
+  .reference-front__volume-slider,
+  .reference-front__play-dial,
+  .reference-front__play-dial-grip,
+  .reference-front__eject-key,
+  .reference-front__eject-mark {
+    transition: none;
+  }
+}

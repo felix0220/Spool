@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.vercel/
+.vercel
+.env
+.env.*
+!.env.example
+
+# Process documentation and design research — kept locally, not published.
+# Only README, AGENTS (durable design direction), and the production handoff ship.
+/*.md
+!/README.md
+!/AGENTS.md
+!/SPOOL_PRODUCTION_HANDOFF.md
+/design-qa-*.png
+/references/

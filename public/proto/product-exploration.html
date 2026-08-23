@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f04b31" />
+    <title>Side A — product body exploration</title>
+    <style>
+      :root {
+        --coral: #f04b31;
+        --coral-deep: #d83c2d;
+        --cream: #dedcd3;
+        --paper: #eeece4;
+        --ink: #12161a;
+        --screen: #090b0d;
+        --line: #4b4d4b;
+        --orange: #f05a2d;
+        --blue: #4b61a8;
+        --ochre: #a97849;
+        --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+      }
+      * { box-sizing: border-box; }
+      html, body { min-height: 100%; margin: 0; }
+      body {
+        min-height: 100vh;
+        overflow-x: hidden;
+        color: var(--ink);
+        background:
+          linear-gradient(rgba(255,255,255,.065) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.065) 1px, transparent 1px),
+          linear-gradient(#f04b31 0%, #ef4a30 70%, #ee5541 100%);
+        background-size: 48px 48px, 48px 48px, auto;
+        font-family: var(--mono);
+        -webkit-font-smoothing: antialiased;
+      }
+      body::after { position: fixed; inset: 0 0 17%; z-index: -1; content: ''; border-bottom: 1px solid rgba(255,255,255,.42); pointer-events: none; }
+      .explore-page { min-height: 100vh; padding: 24px 24px 88px; }
+      .explore-head { display: flex; justify-content: space-between; width: min(1080px, 100%); margin: 0 auto 12px; color: rgba(255,255,255,.78); font-size: 10px; letter-spacing: .15em; }
+      .product-stage { width: min(1080px, 100%); margin: 0 auto; }
+      .product-frame { display: block; width: auto; height: min(842px, calc(100dvh - 130px)); max-width: 100%; margin: 0 auto; overflow: visible; filter: drop-shadow(0 22px 18px rgba(98,23,19,.28)); }
+      .product-frame text { font-family: var(--mono); }
+      .direction-note { display: flex; justify-content: space-between; width: min(1080px, 100%); margin: 10px auto 0; color: rgba(255,255,255,.72); font-size: 10px; letter-spacing: .08em; }
+      .direction-note strong { color: #fff; font-weight: 500; }
+      .direction-note span:last-child { color: rgba(255,255,255,.5); }
+
+      /* Picker spec — prototype harness chrome, intentionally independent of the product palette. */
+      .proto-picker { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 2147483647; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(10,10,10,.82); -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4); box-shadow: 0 0 0 1px rgba(255,255,255,.08) inset, 0 8px 24px rgba(0,0,0,.24), 0 2px 6px rgba(0,0,0,.12); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; line-height: 1; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+      .proto-picker-highlight { position: absolute; top: 4px; left: 0; height: 28px; border-radius: 999px; background: rgba(255,255,255,.12); will-change: transform; }
+      .proto-picker[data-ready] .proto-picker-highlight { transition: transform 250ms cubic-bezier(.23,1,.32,1), width 250ms cubic-bezier(.23,1,.32,1); }
+      .proto-picker-item { position: relative; display: flex; align-items: center; height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: rgba(255,255,255,.55); font: inherit; cursor: pointer; transition: color 150ms ease-out; }
+      .proto-picker-item:hover { color: rgba(255,255,255,.85); }
+      .proto-picker-item:active { transform: scale(.97); }
+      .proto-picker-item:focus-visible { outline: 2px solid rgba(255,255,255,.4); outline-offset: 2px; }
+      .proto-picker-item[data-active] { color: #fff; }
+      .proto-picker-divider { width: 1px; height: 16px; margin: 0 4px; background: rgba(255,255,255,.12); }
+      .proto-picker[data-position="top"] { bottom: auto; top: 24px; }
+      @media (prefers-reduced-motion: reduce) { .proto-picker[data-ready] .proto-picker-highlight { transition: none; } }
+      @media (max-width: 680px) { .explore-page { padding: 16px 12px 80px; } .explore-head, .direction-note { font-size: 8px; } .explore-head span:last-child, .direction-note span:last-child { display: none; } }
+    </style>
+  </head>
+  <body>
+    <main class="explore-page">
+      <header class="explore-head"><span>PRODUCT BODY EXPLORATION / 03 DIRECTIONS</span><span>FRAME 01—03 / CURRENT PRODUCT RATIO</span></header>
+      <div class="product-stage" id="stage"></div>
+      <div class="direction-note" id="direction-note"></div>
+    </main>
+
+    <nav class="proto-picker" aria-label="Prototype variants">
+      <span class="proto-picker-highlight" aria-hidden="true"></span>
+      <button class="proto-picker-item" data-active aria-current="true">Side Rails</button>
+      <button class="proto-picker-item">Low Console</button>
+      <button class="proto-picker-item">Monolith</button>
+      <span class="proto-picker-divider" aria-hidden="true"></span>
+    </nav>
+
+    <script>
+      const wave = (x, y, width, stroke = '#eeece4', scale = 1) => `<path d="M${x} ${y} C${x + width * .08} ${y - 36 * scale} ${x + width * .1} ${y + 22 * scale} ${x + width * .18} ${y - 4 * scale} S${x + width * .29} ${y - 48 * scale} ${x + width * .37} ${y - 2 * scale} S${x + width * .5} ${y + 42 * scale} ${x + width * .58} ${y - 14 * scale} S${x + width * .72} ${y - 55 * scale} ${x + width * .78} ${y - 8 * scale} S${x + width * .9} ${y + 22 * scale} ${x + width} ${y - 5 * scale}" fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round"/>`;
+      const dots = (x, y, cols, rows, gap, fill = '#777a76') => Array.from({ length: cols * rows }, (_, i) => `<circle cx="${x + (i % cols) * gap}" cy="${y + Math.floor(i / cols) * gap}" r="2.6" fill="${fill}"/>`).join('');
+      const knob = (cx, cy, r, accent, label, value, dark = '#24282b') => `<g><text x="${cx}" y="${cy - r - 14}" text-anchor="middle" fill="#787a75" font-size="10" letter-spacing="1.3">${label}</text><circle cx="${cx}" cy="${cy}" r="${r + 8}" fill="#d5d2c8" stroke="#777974" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="${dark}" stroke="${accent}" stroke-width="3"/><path d="M${cx} ${cy - r + 8}V${cy - r / 2}" stroke="${accent}" stroke-width="4" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="5" fill="#d9d7cf"/><text x="${cx}" y="${cy + r + 20}" text-anchor="middle" fill="#8d8d87" font-size="9">${value}</text></g>`;
+      const screw = (cx, cy, dark = false) => `<g><circle cx="${cx}" cy="${cy}" r="9" fill="${dark ? '#24272a' : '#d9d7cf'}" stroke="${dark ? '#858981' : '#767974'}" stroke-width="2"/><path d="M${cx - 4} ${cy}H${cx + 4}" stroke="${dark ? '#d9d7cf' : '#555954'}" stroke-width="2"/></g>`;
+      const transport = (x, y, fill = '#dad8d0') => `<g><rect x="${x}" y="${y}" width="62" height="43" rx="4" fill="${fill}" stroke="#70736e" stroke-width="2"/><path d="M${x + 25} ${y + 12}L${x + 38} ${y + 21}L${x + 25} ${y + 30}Z" fill="#24282b"/><rect x="${x + 15}" y="${y + 14}" width="3" height="15" fill="#24282b"/></g>`;
+      const shell = (body, legs, label, detail, aria) => `<svg class="product-frame" viewBox="0 0 1080 842" role="img" aria-label="${aria}" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid-${label}" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/></pattern><filter id="shadow-${label}" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="12"/><feOffset dy="14"/><feComponentTransfer><feFuncA type="linear" slope=".32"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="wood-${label}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b4e2f"/><stop offset=".5" stop-color="#c27a49"/><stop offset="1" stop-color="#74432e"/></linearGradient></defs><rect width="1080" height="842" fill="${label === 'monolith' ? '#192530' : '#f04b31'}"/><rect width="1080" height="842" fill="url(#grid-${label})" opacity="${label === 'monolith' ? '.55' : '.75'}"/><path d="M0 732H1080" stroke="rgba(255,255,255,.52)"/><g filter="url(#shadow-${label})">${legs}${body}</g></svg>`;
+
+      const sideRails = () => shell(`
+        <rect x="88" y="77" width="904" height="654" rx="24" fill="#e0ded5" stroke="#f1efe8" stroke-width="10"/>
+        <rect x="104" y="94" width="872" height="622" rx="15" fill="#d1d0c7" stroke="#858780" stroke-width="2"/>
+        ${screw(118, 102)}${screw(962, 102)}${screw(118, 709)}${screw(962, 709)}
+        <rect x="198" y="112" width="702" height="510" rx="8" fill="#22272b" stroke="#59605f" stroke-width="3"/>
+        <rect x="200" y="112" width="698" height="25" rx="5" fill="#15191c"/>
+        <rect x="200" y="129" width="698" height="8" fill="#c9482f"/>
+        <rect x="202" y="140" width="694" height="475" fill="#252b30"/>
+        <rect x="208" y="146" width="415" height="217" rx="8" fill="#090b0d" stroke="#4b4e4c" stroke-width="3"/>
+        <rect x="635" y="146" width="248" height="217" rx="8" fill="#090b0d" stroke="#4b4e4c" stroke-width="3"/>
+        <path d="M224 193H606M224 236H606M224 279H606M224 322H606" stroke="#2c3337"/>
+        ${wave(227, 270, 372, '#eeece4', 1.2)}<path d="M405 150V358" stroke="#f05a2d" stroke-width="2"/><circle cx="405" cy="154" r="5" fill="#f05a2d"/>
+        <g fill="#f05a2d"><rect x="227" y="157" width="7" height="26"/><rect x="245" y="164" width="7" height="19"/><rect x="263" y="151" width="7" height="32"/><rect x="281" y="168" width="7" height="15"/><rect x="299" y="154" width="7" height="29"/></g>
+        <g fill="#777a76"><rect x="225" y="345" width="365" height="4" rx="2"/><rect x="225" y="340" width="160" height="5" rx="2" fill="#f05a2d"/></g>
+        <text x="218" y="158" fill="#eeece4" font-size="10" letter-spacing="2">SIDE A / FREEFLOW</text><text x="744" y="158" fill="#f05a2d" font-size="10" letter-spacing="2">STEREO</text>
+        <text x="222" y="382" fill="#8d8d87" font-size="9">01:22</text><text x="606" y="382" fill="#8d8d87" text-anchor="end" font-size="9">06:09</text>
+        <text x="650" y="172" fill="#eeece4" font-size="10" letter-spacing="1.6">LEVEL</text><text x="856" y="172" fill="#8d8d87" text-anchor="end" font-size="9">VOL 57%</text><path d="M650 184H868" stroke="#444a4b"/>
+        ${[0,1,2,3,4,5,6,7].map((i) => `<rect x="654" y="${272 - (i % 4) * 13}" width="8" height="${24 + (i % 4) * 9}" fill="#6d716f" opacity=".75"/>`).join('')}${knob(804, 270, 28, '#8b8e88', 'SIGNAL / LIVE', 'RATE 1.4×', '#202528')}
+        <rect x="208" y="378" width="675" height="102" rx="6" fill="#0a0c0e" stroke="#4b4e4c" stroke-width="3"/>
+        <text x="223" y="403" fill="#eeece4" font-size="10" letter-spacing="1.5">TRANSPORT</text><text x="451" y="403" fill="#eeece4" font-size="10" letter-spacing="1.5">TRACK</text><text x="678" y="403" fill="#eeece4" font-size="10" letter-spacing="1.5">CAPTURE / SIGNAL</text>
+        <path d="M223 414H391M451 414H640M678 414H868" stroke="#444a4b"/>
+        <text x="223" y="436" fill="#8d8d87" font-size="8">POSITION</text><text x="391" y="436" fill="#eeece4" text-anchor="end" font-size="9">1:22</text><text x="223" y="454" fill="#8d8d87" font-size="8">STATE</text><text x="391" y="454" fill="#eeece4" text-anchor="end" font-size="9">READY</text>
+        <text x="451" y="436" fill="#8d8d87" font-size="8">SIDE</text><text x="640" y="436" fill="#eeece4" text-anchor="end" font-size="9">A / FREEFLOW</text><path d="M452 463 C484 440 512 478 546 454 S607 444 633 462" fill="none" stroke="#f05a2d" stroke-width="2"/>
+        <text x="678" y="436" fill="#8d8d87" font-size="8">RECORDED</text><text x="868" y="436" fill="#4b61a8" text-anchor="end" font-size="9">83 SEC</text><rect x="678" y="450" width="190" height="6" rx="3" fill="#353a42"/><rect x="678" y="450" width="47" height="6" rx="3" fill="#4b61a8"/>
+        <rect x="208" y="494" width="675" height="107" fill="#22272b"/><path d="M325 575H868" stroke="#4b61a8" stroke-width="6"/><path d="M454 560V590" stroke="#d8d5cb" stroke-width="2"/>
+        <rect x="105" y="111" width="94" height="507" rx="8" fill="#dedcd3" stroke="#a8aaa2" stroke-width="2"/><rect x="899" y="111" width="77" height="507" rx="8" fill="#dedcd3" stroke="#a8aaa2" stroke-width="2"/>
+        <text x="152" y="153" text-anchor="middle" fill="#22272b" font-size="9" letter-spacing="1.5">INPUT</text><text x="152" y="174" text-anchor="middle" fill="#8d8d87" font-size="7">LEVEL</text><rect x="141" y="190" width="22" height="136" rx="4" fill="#252a2d" stroke="#777a75" stroke-width="2"/><path d="M152 205V312" stroke="#4b61a8" stroke-width="5"/><circle cx="152" cy="251" r="7" fill="#dedcd3" stroke="#4b61a8" stroke-width="2"/>${knob(152, 420, 25, '#a97849', 'SPEED', '1.0×')}${transport(125, 540, '#eeece4')}
+        ${knob(938, 182, 24, '#24282b', 'OUTPUT', '−03 dB', '#d3d1c8')}<text x="938" y="251" text-anchor="middle" fill="#8d8d87" font-size="7">SIG&nbsp;&nbsp; OVR&nbsp;&nbsp; PWR</text>${[['#9bb58f', 916], ['#f05a2d', 938], ['#4b61a8', 960]].map(([c,x]) => `<circle cx="${x}" cy="268" r="5" fill="${c}" stroke="#777a75"/>`)}<text x="938" y="310" text-anchor="middle" fill="#8d8d87" font-size="7">LOOP</text><rect x="922" y="323" width="33" height="42" rx="4" fill="#eeece4" stroke="#777a75" stroke-width="2"/><rect x="929" y="334" width="19" height="10" rx="2" fill="#4b61a8"/><rect x="908" y="422" width="29" height="40" rx="4" fill="#eeece4" stroke="#777a75" stroke-width="2"/><rect x="916" y="438" width="11" height="4" rx="2" fill="#f05a2d"/><rect x="943" y="422" width="29" height="40" rx="4" fill="#eeece4" stroke="#777a75" stroke-width="2"/><rect x="951" y="438" width="11" height="4" rx="2" fill="#f05a2d"/>
+      `, `
+        <path d="M170 719L197 719L221 809L161 809Z" fill="url(#wood-sideRails)" stroke="#6a422e" stroke-width="3"/><path d="M883 719L910 719L919 809L859 809Z" fill="url(#wood-sideRails)" stroke="#6a422e" stroke-width="3"/><path d="M161 809H221M859 809H919" stroke="#4b4d4b" stroke-width="5"/><ellipse cx="191" cy="810" rx="31" ry="8" fill="#dedcd3" stroke="#6b6e69" stroke-width="3"/><ellipse cx="889" cy="810" rx="31" ry="8" fill="#dedcd3" stroke="#6b6e69" stroke-width="3"/>
+      `, 'sideRails', 'SIDE RAILS / FIELD RECORDER', 'The current frame made into a side-rail field recorder with wood legs.');
+
+      const lowConsole = () => shell(`
+        <rect x="96" y="98" width="888" height="610" rx="38" fill="#d8d6cd" stroke="#f1efe7" stroke-width="10"/>
+        <rect x="112" y="114" width="856" height="578" rx="26" fill="#bfc2bd" stroke="#787d78" stroke-width="2"/>
+        ${screw(130, 125)}${screw(950, 125)}${screw(130, 680)}${screw(950, 680)}
+        <rect x="144" y="145" width="792" height="322" rx="18" fill="#24292d" stroke="#666c68" stroke-width="4"/>
+        <rect x="164" y="166" width="560" height="263" rx="9" fill="#07090b" stroke="#4b4e4d" stroke-width="3"/><rect x="744" y="166" width="170" height="263" rx="9" fill="#111518" stroke="#4b4e4d" stroke-width="3"/>
+        <path d="M184 224H704M184 278H704M184 332H704M184 386H704" stroke="#2e3538"/>${wave(186, 321, 500, '#eeece4', 1.45)}<path d="M452 170V423" stroke="#f05a2d" stroke-width="2"/><circle cx="452" cy="173" r="5" fill="#f05a2d"/>
+        <g fill="#a97849"><rect x="188" y="181" width="9" height="30"/><rect x="208" y="193" width="9" height="18"/><rect x="228" y="178" width="9" height="33"/><rect x="248" y="188" width="9" height="23"/><rect x="268" y="180" width="9" height="31"/></g>
+        <text x="184" y="185" fill="#eeece4" font-size="10" letter-spacing="2">01 / DESK CUT</text><text x="870" y="185" text-anchor="end" fill="#f05a2d" font-size="10" letter-spacing="2">PLAYING</text><text x="184" y="449" fill="#8d8d87" font-size="9">00:00</text><text x="704" y="449" text-anchor="end" fill="#8d8d87" font-size="9">04:20</text>
+        <text x="766" y="199" fill="#eeece4" font-size="9" letter-spacing="1.4">LEVEL</text><path d="M766 218H894" stroke="#454b4b"/>${[0,1,2,3,4,5].map(i => `<rect x="770" y="${257 - i * 13}" width="9" height="${30 + i * 7}" fill="${i === 5 ? '#f05a2d' : '#777d78'}"/>`).join('')}<text x="766" y="370" fill="#8d8d87" font-size="8">PEAK HOLD</text>${knob(845, 393, 22, '#4b61a8', 'MIX', '57%', '#202528')}
+        <rect x="144" y="486" width="792" height="174" rx="18" fill="#d0cec4" stroke="#777b76" stroke-width="3"/>
+        <path d="M165 548H915" stroke="#9a9a92"/><text x="170" y="518" fill="#313638" font-size="10" letter-spacing="2">LOW CONSOLE / HANDS-ON EDITING</text>
+        ${knob(226, 598, 31, '#f05a2d', 'INPUT', '+06 dB', '#272b2e')}${knob(385, 598, 31, '#4b61a8', 'FILTER', '440 Hz', '#272b2e')}${knob(544, 598, 31, '#a97849', 'DRIVE', '12%', '#272b2e')}
+        <text x="672" y="558" fill="#313638" font-size="9" letter-spacing="1.2">PITCH</text><rect x="672" y="574" width="196" height="18" rx="3" fill="#383d3e" stroke="#777b76"/><path d="M686 583H854" stroke="#aaa9a2"/><rect x="766" y="576" width="5" height="14" fill="#f05a2d"/>${transport(650, 610, '#eeece4')}${transport(720, 610, '#eeece4')}${transport(790, 610, '#f05a2d')}
+        <rect x="96" y="120" width="48" height="486" rx="18" fill="#24292d"/><circle cx="120" cy="181" r="10" fill="#f05a2d"/><path d="M120 203V420" stroke="#777d78" stroke-width="2"/><text x="120" y="453" text-anchor="middle" fill="#d8d6cd" font-size="8" transform="rotate(-90 120 453)">SOURCE / CAPTURE</text>
+      `, `
+        <path d="M202 704L239 704L271 800L178 800Z" fill="#2b3032" stroke="#111518" stroke-width="4"/><path d="M841 704L878 704L902 800L809 800Z" fill="#2b3032" stroke="#111518" stroke-width="4"/><path d="M188 798H893" stroke="#202528" stroke-width="16" stroke-linecap="round"/><path d="M190 792H891" stroke="#777d78" stroke-width="2"/>
+      `, 'lowConsole', 'LOW CONSOLE / DESK MACHINE', 'The frame becomes a low mixing console with a continuous fascia and a steel sled base.');
+
+      const monolith = () => shell(`
+        <rect x="90" y="86" width="900" height="642" rx="18" fill="#202a32" stroke="#9ba39e" stroke-width="5"/>
+        <rect x="108" y="104" width="864" height="606" rx="8" fill="#151b20" stroke="#313b40" stroke-width="3"/>
+        ${screw(116, 112, true)}${screw(964, 112, true)}${screw(116, 700, true)}${screw(964, 700, true)}
+        <rect x="126" y="128" width="616" height="425" rx="10" fill="#090d10" stroke="#596066" stroke-width="3"/>
+        <rect x="146" y="151" width="576" height="263" rx="4" fill="#0a0c0e" stroke="#394247"/><path d="M166 204H700M166 257H700M166 310H700M166 363H700" stroke="#273137"/>${wave(170, 293, 504, '#d8d5cb', 1.15)}<path d="M452 153V412" stroke="#f05a2d" stroke-width="3"/><circle cx="452" cy="156" r="6" fill="#f05a2d"/>
+        <text x="150" y="177" fill="#d8d5cb" font-size="10" letter-spacing="2">03 / MONOLITH</text><text x="702" y="177" text-anchor="end" fill="#f05a2d" font-size="10" letter-spacing="2">SIDE A</text><text x="166" y="441" fill="#7f898a" font-size="9">00:00</text><text x="700" y="441" text-anchor="end" fill="#7f898a" font-size="9">06:09</text>
+        <rect x="126" y="444" width="616" height="109" fill="#1a2227"/><path d="M149 514H716" stroke="#4b61a8" stroke-width="5"/><path d="M458 497V531" stroke="#d8d5cb" stroke-width="2"/>
+        <rect x="765" y="128" width="187" height="425" rx="8" fill="#d8d5cb" stroke="#8c938e" stroke-width="3"/>
+        <rect x="784" y="149" width="149" height="100" rx="5" fill="#090d10" stroke="#313b40" stroke-width="3"/><text x="796" y="171" fill="#d8d5cb" font-size="9" letter-spacing="1.4">CARTRIDGE</text><circle cx="821" cy="208" r="22" fill="#202a32" stroke="#d8d5cb" stroke-width="3"/><circle cx="897" cy="208" r="22" fill="#202a32" stroke="#d8d5cb" stroke-width="3"/><path d="M839 208H879" stroke="#a97849" stroke-width="2"/>
+        <text x="790" y="283" fill="#24292d" font-size="10" letter-spacing="1.5">FREQ</text>${knob(856, 335, 34, '#4b61a8', '440—1440', 'ACTIVE', '#1d252a')}<text x="790" y="419" fill="#555e60" font-size="8">BIAS&nbsp;&nbsp;&nbsp;&nbsp; EQ&nbsp;&nbsp;&nbsp;&nbsp; NR</text>${dots(795, 444, 7, 4, 17, '#606a6b')}
+        <rect x="126" y="575" width="826" height="118" rx="7" fill="#0c1114" stroke="#4f585d" stroke-width="3"/>
+        <text x="150" y="601" fill="#d8d5cb" font-size="10" letter-spacing="1.7">MONOLITH CONTROL PLINTH</text>${knob(210, 653, 24, '#f05a2d', 'INPUT', '+06', '#20282d')}${knob(355, 653, 24, '#a97849', 'TONE', 'WARM', '#20282d')}${knob(500, 653, 24, '#4b61a8', 'OUTPUT', '−03', '#20282d')}<path d="M620 642H792" stroke="#767f80" stroke-width="2"/><path d="M620 654H792" stroke="#f05a2d" stroke-width="4"/><path d="M620 666H792" stroke="#767f80" stroke-width="2"/>${transport(826, 624, '#f05a2d')}
+      `, `
+        <path d="M169 719L246 719L238 800L159 800Z" fill="#27363e" stroke="#11181d" stroke-width="4"/><path d="M834 719L911 719L925 800L846 800Z" fill="#27363e" stroke="#11181d" stroke-width="4"/><path d="M156 801H242M842 801H928" stroke="#d8d5cb" stroke-width="5"/><circle cx="199" cy="801" r="8" fill="#f05a2d"/><circle cx="885" cy="801" r="8" fill="#4b61a8"/>
+      `, 'monolith', 'MONOLITH / CARTRIDGE TOWER', 'A darker broadcast-machine body with a dedicated right-side cartridge tower and plinth legs.');
+
+      const variants = [sideRails, lowConsole, monolith];
+      const labels = ['SIDE RAILS / FIELD RECORDER', 'LOW CONSOLE / DESK MACHINE', 'MONOLITH / CARTRIDGE TOWER'];
+      const details = ['Screen centered, side rails carry the physical controls, and the wood legs keep the product furniture-like.', 'The screen becomes a shallow console, the controls become one continuous working surface, and the steel sled lowers the center of gravity.', 'A dark broadcast-machine shell makes the cartridge a dedicated object and gives the body a heavier, more collectible presence.'];
+      const stage = document.getElementById('stage');
+      const note = document.getElementById('direction-note');
+      const picker = document.querySelector('.proto-picker');
+      const highlight = picker.querySelector('.proto-picker-highlight');
+      const items = [...picker.querySelectorAll('.proto-picker-item')];
+      let current = 0;
+
+      function moveHighlight() { const item = items[current]; highlight.style.width = item.offsetWidth + 'px'; highlight.style.transform = `translateX(${item.offsetLeft}px)`; }
+      function mount(i) { stage.innerHTML = variants[i](); note.innerHTML = `<strong>${labels[i]}</strong><span>${details[i]}</span>`; }
+      function setActive(i) {
+        if (i < 0 || i >= variants.length) return;
+        current = i;
+        items.forEach((el, j) => { el.toggleAttribute('data-active', j === i); if (j === i) el.setAttribute('aria-current', 'true'); else el.removeAttribute('aria-current'); });
+        moveHighlight();
+        const url = new URL(location); url.searchParams.set('v', i + 1); history.replaceState(null, '', url);
+        mount(i);
+      }
+      items.forEach((el, i) => el.addEventListener('click', () => setActive(i)));
+      window.addEventListener('resize', moveHighlight);
+      document.addEventListener('keydown', (event) => {
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable) return;
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+        const number = parseInt(event.key, 10);
+        if (number >= 1 && number <= variants.length) setActive(number - 1);
+        else if (event.key === 'ArrowRight') setActive((current + 1) % variants.length);
+        else if (event.key === 'ArrowLeft') setActive((current - 1 + variants.length) % variants.length);
+      });
+      setActive((parseInt(new URLSearchParams(location.search).get('v'), 10) || 1) - 1);
+      requestAnimationFrame(() => requestAnimationFrame(() => picker.setAttribute('data-ready', '')));
+    </script>
+  </body>
+</html>

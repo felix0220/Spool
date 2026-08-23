@@ -1,0 +1,164 @@
+.graphic-stage {
+  --color-canvas: #f04b31;
+  --color-ink: oklch(0.17 0.02 25);
+  --color-cream: oklch(0.93 0.02 88);
+  --color-accent: oklch(0.65 0.2 35);
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  /* The CSS stage owns the single continuous background. The SVG is a
+     transparent product layer and must be allowed to paint cassette exits
+     and shadows into the same surrounding space. The document viewport is
+     the final boundary, not the product frame. */
+  overflow: visible;
+  isolation: isolate;
+  background: var(--color-canvas);
+  background-image:
+    linear-gradient(to right, rgb(200 63 46 / .55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(200 63 46 / .55) 1px, transparent 1px);
+  background-size: 38px 38px;
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+
+.graphic-stage__frame {
+  position: relative;
+  width: min(100%, calc(100dvh * 1420 / 1108));
+  aspect-ratio: 1420 / 1108;
+  overflow: visible;
+}
+
+.graphic-stage__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  user-select: none;
+  touch-action: none;
+}
+
+/* The reference product keeps its physical control spacing on touch layouts.
+   A minimum internal stage width prevents the transparent semantic hit areas
+   from collapsing below 44px or overlapping the neighboring transport keys. */
+@media (max-width: 680px) {
+  .graphic-stage {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    touch-action: pan-x;
+  }
+
+  .graphic-stage__frame {
+    width: 840px;
+    max-width: none;
+    margin: 0 auto;
+  }
+}
+
+.graphic-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.graphic-audio-source {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.graphic-tape {
+  transform-box: fill-box;
+  transform-origin: center;
+  cursor: grab;
+  touch-action: none;
+  transition: filter 150ms ease-out;
+}
+
+.graphic-tape:active { cursor: grabbing; }
+.graphic-tape:focus-visible { filter: drop-shadow(0 0 0.5px #111113) brightness(1.04); }
+.graphic-tape[data-holding="true"] {
+  filter: brightness(1.045) saturate(1.04);
+  will-change: filter;
+}
+
+.graphic-tape-idle-drift {
+  animation: cassette-idle-drift 4.65s ease-in-out infinite;
+  animation-delay: var(--idle-delay, 0s);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes cassette-idle-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.graphic-stage:not([data-phase="standby"]) .graphic-tape-idle-drift {
+  animation-play-state: paused;
+}
+
+/* The onboarding signal occupies the intentional air gap between the open
+   intake surface and the cassette row. It is decorative guidance only: it
+   must never become a competing hit target or alter the product geometry. */
+.graphic-intake-hint {
+  pointer-events: none;
+  color: var(--color-cream);
+}
+
+.graphic-intake-hint__arrow {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .28;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intake-hint-arrow 1.9s cubic-bezier(.22, .8, .28, 1) infinite;
+  will-change: opacity, transform;
+}
+
+.graphic-intake-hint__arrow--one { animation-delay: -.96s; }
+.graphic-intake-hint__arrow--two { animation-delay: -.64s; }
+.graphic-intake-hint__arrow--three { animation-delay: -.32s; }
+
+@keyframes intake-hint-arrow {
+  0%, 100% {
+    opacity: .22;
+    transform: translateY(5px);
+  }
+  38% {
+    opacity: .84;
+    transform: translateY(0);
+  }
+  72% {
+    opacity: .58;
+    transform: translateY(-3px);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .graphic-tape:hover { filter: brightness(1.035) saturate(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graphic-tape-idle-drift { animation: none; }
+  .graphic-intake-hint__arrow {
+    animation: none;
+    opacity: .72;
+    transform: none;
+  }
+  .graphic-tape { transition: none; }
+}
