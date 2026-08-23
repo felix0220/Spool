@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="SPOOL">
+  <title>SPOOL</title>
+  <!-- Two cassette locating holes, tangent on the diagonal. Each keeps 270 degrees
+       of arc; the complement of the other. The S is what is left over. -->
+  <path d="M 55.97 20.02 A 21.6 21.6 0 1 0 50 50 A 21.6 21.6 0 1 1 44.04 79.99"
+        fill="none" stroke="#151719" stroke-width="13.5" stroke-linecap="round"/>
+</svg>

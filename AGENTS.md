@@ -198,3 +198,31 @@ Execute future work from `SIDE_A_TASK_EXECUTION_BOOK_V0_7.md`, exactly one Task 
 - Fixed chassis details own the upper shoulder: two restrained inset fasteners, paired dark circular vent banks, and the recessed `SPO` plaque. These details do not move with the lid.
 - The moving lid stays visually quiet and owns only its seam, restrained bevel/highlight, and molded-plastic grain. Do not place a chassis plaque, vent bank, or arbitrary decorative bars on the moving lid.
 - Industrial detail hierarchy is functional voids first, seams/fasteners second, grain last. Vent cavities are darker than surface seams; grain remains low contrast and may not read as random dirt or a dotted UI pattern.
+
+### Brand mark — v1.0
+
+The product is named SPOOL. The browser title is the bare word `SPOOL`; the
+machine's top-surface plaque keeps its script `spool.` wordmark. These are two
+registers of the same name, not a conflict — do not unify them.
+
+The mark is never drawn as a letter. It is constructed from the cassette's two
+locating holes: two circles of radius 21.6 centred at (38, 32) and (62, 68) in
+a 100 × 100 field, tangent on the diagonal at (50, 50). Each keeps 270° of arc
+— exactly the complement of the other's gap — so the upper hole opens toward
+the lower-right and the lower hole opens toward the upper-left. The S is the
+residue of that subtraction, and the two counters must stay readable as holes.
+
+```
+M 55.97 20.02 A 21.6 21.6 0 1 0 50 50 A 21.6 21.6 0 1 1 44.04 79.99
+stroke-width 13.5, round caps
+```
+
+Assets: `public/mark.svg` is the line mark in ink on transparent, for documents
+and any in-product use. `public/favicon.svg` is the same path carved out of a
+coral `#F04B31` tile with the stroke reading cream `#F2F0E7`; `favicon-32.png`
+and `apple-touch-icon.png` are raster fallbacks of that tile.
+
+Do not add hub teeth inside the counters. At mark scale they read as asterisks,
+and below 32px they fill in. Hub teeth belong to the cassette body, which draws
+them already. Do not re-letter the S from a typeface — if the geometry changes,
+change the two circles, not the curve.
