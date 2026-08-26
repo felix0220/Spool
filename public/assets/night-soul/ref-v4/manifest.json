@@ -1,0 +1,214 @@
+{
+  "version": "ref-v4",
+  "source": {
+    "file": "artifacts/night-soul/ref-v4/night-soul-blue-reel-selected.png",
+    "size": [
+      1412,
+      1114
+    ],
+    "sha256": "726696f70fb812e472c8f17a3314044dfa69f1cb45716716f8a7ecd4a6f3eb66"
+  },
+  "master": {
+    "size": [
+      1120,
+      624
+    ],
+    "runtimeScale": 4,
+    "runtimeFootprint": [
+      280,
+      156
+    ]
+  },
+  "geometry": {
+    "bodyClip": [
+      -140,
+      -78,
+      280,
+      156,
+      11
+    ],
+    "reelCenters": [
+      [
+        -65,
+        0
+      ],
+      [
+        65,
+        0
+      ]
+    ],
+    "reelFaceRadius": 50,
+    "reelHoleRadius": 20,
+    "guideCenters": [
+      [
+        -94,
+        49
+      ],
+      [
+        94,
+        49
+      ]
+    ],
+    "guideOuterRadius": 13,
+    "centreLock": [
+      0,
+      50,
+      7
+    ],
+    "printPivots": {
+      "left": [
+        200,
+        200
+      ],
+      "right": [
+        200,
+        200
+      ]
+    }
+  },
+  "assets": [
+    {
+      "file": "left-reel-print.png",
+      "size": [
+        400,
+        400
+      ],
+      "mode": "RGBA",
+      "sha256": "a7152d681c2e73d1f69678660a864924bb49482f82ed20b8cc5d45d96b8e97de",
+      "alphaExtrema": [
+        0,
+        234
+      ],
+      "nonzeroAlphaPixels": 5275
+    },
+    {
+      "file": "right-reel-print.png",
+      "size": [
+        400,
+        400
+      ],
+      "mode": "RGBA",
+      "sha256": "49cf9a3693796d02e538434a35f55fea087cc3bdf68aa73a1e86426699b7cf1e",
+      "alphaExtrema": [
+        0,
+        234
+      ],
+      "nonzeroAlphaPixels": 4690
+    },
+    {
+      "file": "reel-face-grain.png",
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "sha256": "e335a91888d1bc79a6c0aeec2992698fcda2380fe2e45d550a4fbc66e0ea785a",
+      "alphaExtrema": [
+        6,
+        60
+      ],
+      "nonzeroAlphaPixels": 16384
+    },
+    {
+      "file": "shell-fog-overlay.png",
+      "size": [
+        1120,
+        624
+      ],
+      "mode": "RGBA",
+      "sha256": "c7d77d5ef589be2f5f00acd5f99cdd916ceb618be571979a000475a6ce5bb648",
+      "alphaExtrema": [
+        0,
+        53
+      ],
+      "nonzeroAlphaPixels": 658320
+    },
+    {
+      "file": "shell-edge-wear.png",
+      "size": [
+        1120,
+        624
+      ],
+      "mode": "RGBA",
+      "sha256": "4c86de4d427eb84302e40cc3136e0630860aa6d2380ff0cba40a69023faa8aed",
+      "alphaExtrema": [
+        0,
+        78
+      ],
+      "nonzeroAlphaPixels": 5214
+    },
+    {
+      "file": "electric-glow-texture.png",
+      "size": [
+        1120,
+        624
+      ],
+      "mode": "RGBA",
+      "sha256": "94a4d5fe7720a5eda087358016bede3f8a5224906ad317cd51cc661b8b5f9905",
+      "alphaExtrema": [
+        0,
+        105
+      ],
+      "nonzeroAlphaPixels": 698826
+    },
+    {
+      "file": "surface-grain.png",
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA",
+      "sha256": "a5cc0f03af61d6cb1d68d75afdd7b562d9881b4036ab183a7c953704a4d97e2d",
+      "alphaExtrema": [
+        5,
+        20
+      ],
+      "nonzeroAlphaPixels": 4096
+    }
+  ],
+  "reusedTransparentAssets": [
+    {
+      "file": "../ref-v2/lord-strip.png",
+      "size": [
+        300,
+        135
+      ],
+      "sha256": "d5d25ed5759415f84b3a3b7ad59b96f96b3842506d05e8b4e62750d8757a862d"
+    },
+    {
+      "file": "../ref-v2/wait-on-you-strip.png",
+      "size": [
+        450,
+        185
+      ],
+      "sha256": "fb46d351cc45e3c89ed80f33157a5d19530b0e161fe19302a91f0f6b09e89419"
+    },
+    {
+      "file": "../ref-v2/print-distress-mask.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "1f0f28cedcfca1f0f0b9479c8c0132994c42035e58c2b641424279768dc7a150"
+    }
+  ],
+  "renderOrder": [
+    "rear-media",
+    "lower-mechanical-substrate",
+    "translucent-shell-field",
+    "electric-glow-texture",
+    "shell-fog-overlay",
+    "molded-seams",
+    "functional-reel-face",
+    "lower-guide-hardware",
+    "shell-edge-wear",
+    "lord-strip",
+    "wait-on-you-strip",
+    "surface-grain"
+  ],
+  "extraction": {
+    "reelPrints": "cobalt ink segmentation inside the face plate with true hole and aperture exclusion masks",
+    "materialLayers": "deterministic seeded alpha-only texture generation; no text, chassis, plate or coral pixels",
+    "zeroAlphaRgb": "cleared to 0,0,0 for every output"
+  }
+}

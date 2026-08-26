@@ -43,6 +43,55 @@ positions. When Eject is triggered, those same two cassettes return from below
 and travel upwards into HOME without a scale pop. Preserve pointer-capture
 dragging, hole-to-receiver lock, lid/jaw order, and top-to-front continuity.
 
+### Cassette drag hit-target correction — v0.4
+
+Every interactive cassette must include one transparent full-surface SVG hit
+rectangle inside the cassette's idle-drift group. This hit surface is separate
+from the visual artwork so image-only branches cannot become inert when their
+child layers opt out of pointer events. It must inherit the cassette parent
+transform, stay outside the reel-hole mask, be enabled only for interactive
+cassettes, and leave the shared footprint and visual layers unchanged.
+
+### Three cassette visual system — v1.0
+
+- Treat the landing cassettes as one shared mechanical mother chassis with
+  three manufacturing editions, never as one template recolored three times.
+- The `280 × 156` footprint, reel centers at `±65`, transparent receiver holes
+  at radius `20`, insertion edge, HOME geometry and all motion are immutable.
+- `ribbed` uses broad warm molded ribs, `signal` uses a smoked cobalt signal
+  window with coarse meter blocks, and `paper` uses opaque molded vertical
+  relief. These structural differences must remain legible in grayscale.
+- At the real landing scale, primary identity strokes are at least `3` design
+  units and titles are at least `10` design units. Do not use tiny waveforms,
+  micro-grids or ornamental microtext as the edition identity.
+- Titles use the canonical audio-library `labelLines` inside a protected title
+  field. Keep all identity detail clear of reel rings and receiver holes.
+- Execute and verify these rules from
+  `THREE_CASSETTE_VISUAL_SYSTEM_EXECUTION_BOOK.md` without changing the bay,
+  lid, jaws, camera, front interface or cassette lifecycle.
+
+### First-cassette depth refinement — v1.1
+
+- The v1.0 optical minimums are guardrails, not target weights. Do not make
+  every title, frame and feature maximally bold merely because it survives at
+  the landing scale.
+- Refine one cassette at a time. The current pass changes only `ember`; the
+  `blue` and `cream` cassette artwork stays frozen until Ember passes visual
+  review.
+- Ember adapts one transferable feature from the supplied cassette references:
+  an asymmetrical wound-tape mass visible through a translucent tinted shell.
+  It must read in five ordered layers: rear tape media, translucent shell,
+  narrow index strip, reel/hole hardware, and restrained molded highlights.
+- The track title is tertiary manufacturing information on the narrow index
+  strip, never a central album-cover plaque. Large framing, broad decorative
+  bars and arbitrary micro-graphics are not substitutes for physical depth.
+- Internal depth uses low-contrast translucent surfaces and fine seams. Keep a
+  strong line only where two mechanical parts actually meet. Preserve the
+  shared footprint, receiver holes, insertion edge and all motion unchanged.
+- Execute and verify this correction from
+  `EMBER_CASSETTE_DEPTH_REFINEMENT_EXECUTION_BOOK.md` before applying the same
+  method to another cassette.
+
 ### Rendering boundary correction — v0.4
 
 The coral grid background has one owner: `.graphic-stage` CSS. Do not redraw
@@ -174,6 +223,29 @@ Execute future work from `SIDE_A_TASK_EXECUTION_BOOK_V0_7.md`, exactly one Task 
 - The right screen rail uses its full effective column: status rows keep a stable left label and expose real state/readout values at the right edge; shuttle marks span the rail instead of clustering on the left and leaving an accidental empty half.
 - Screen reel playback keeps the white reel disc and center hub static. Only the internal needle path may rotate clockwise from the black center pivot, and it must inherit the existing real `playing` state and reduced-motion contract.
 
+### Top view corner-radius correction — v1.0
+
+- The top projection carries the same rounded product language as the front view: the outer top shell and its inset panel/frame use shared rounded-quad geometry rather than sharp polygon corners.
+- Corner ownership is limited to the product shell and inset frame. The bay opening, moving lid, brand wells, fasteners, and other pressed/embossed mechanical details retain their original hard geometry.
+
+### Ember reference recreation — v1.1
+
+- The selected Ember visual truth is the orange/amber transparent cassette reference: warm clear shell, deep-black internal reel media, orange reel hubs and lower guide knobs, a single narrow tape route through both lower guides, restrained segmented signal registration, and small `Chill Lo-fi` manufacturing information.
+- Keep the shared 280 × 156 chassis, receiver holes, HOME geometry, and cassette interaction unchanged. Do not copy commercial branding, wording, or figurative artwork from any supplied cassette image.
+- The cassette face must read as one transparent physical object. Use a small number of ordered SVG layers—media, tape route, lower mechanical panel, shell, seams, segmented signal/index marks, and hub hardware—rather than many decorative HTML details.
+- The tape is a line, not a wide bridge. It must visibly route from the reels through the two lower guide knobs; the lower panel and shell texture remain restrained and material-bound.
+- The visible Ember title is exactly `Chill Lo-fi`; do not reintroduce `SIDE A`, a second edition card, a broad signal bar or legacy printed-field copy.
+- Execute and verify this direction from `EMBER_CASSETTE_REFERENCE_RECREATION_EXECUTION_BOOK.md` before applying any related visual method to another cassette.
+
+### Ember Mechanical Index P0 correction — v1.2
+
+- This correction supersedes the former compound-label direction. Ember must no longer use a full orange banner, central cream title card, `SIDE A` sticker, waveform sticker, `LOW SIGNAL`, or `WARM TAPE` microcopy.
+- Protect the reel rings with a radius-`29` exclusion zone around `(-65, 0)` and `(65, 0)`. Protect the lower guides with a radius-`18` exclusion zone around `(-94, 49)` and `(94, 49)`. Printed information may not enter those zones.
+- Upper signal registration is three short orange segments at `y=-48`, not a continuous bar. The lower manufacturing index is one translucent rail at `x=-70`, `y=40`, `width=140`, `height=13`; it sits between the guide safe zones and above the centre tape route.
+- The only visible Ember copy is left-aligned `Chill Lo-fi` and right-aligned `01` on the shared index baseline. They are tertiary manufacturing information, never the main visual.
+- Preserve the transparent amber shell, wound-tape media, routed tape line, reel/hole hardware, guide knobs, shared footprint, interaction lifecycle, and Blue/Cream artwork.
+- Execute and verify this correction from `EMBER_CASSETTE_P0_GEOMETRY_EXECUTION_BOOK.md`. Typography personality is deferred until this geometry gate passes.
+
 ### Industrial shell surface exploration — v0.1
 
 - The current front interface, control positions, chassis ratio, top-loading bay dimensions, and cassette/lid motion are frozen during industrial-surface exploration.
@@ -267,3 +339,263 @@ share a v-span, that both halves sit on `midV`, that the badge centres on
 u = .5, that each half centres in its own well, and that the pressed path still
 equals `public/mark.svg`. Do not move these numbers back into the renderer —
 the test checks for that too.
+
+### Ember sticker production lock — v1.0
+
+- The selected Ember visual source is `design-reference-ember-stickers-position-v1.png`.
+- Ember now uses the real transparent assets `public/assets/ember-stickers/chill-lofi-moon-star.png` and `public/assets/ember-stickers/northern-star.png` as fixed surface-sticker layers. Do not recreate these as HTML text or approximate CSS/SVG drawings.
+- The Chill Lo-fi sticker keeps the approved wordmark and material treatment, with only two graphic-letter refinements: the leading `C` carries a subtle crescent-moon opening, and the final `i` dot is a small four-point star. Keep both changes subordinate to the wordmark; no extra celestial icons or copy.
+- The old translucent lower title rail, old small `Chill Lo-fi`, `01`, `LOW SIGNAL`, and `WARM TAPE` copy are superseded and must not return.
+- Sticker coordinates are cassette-local and immutable: `Chill Lo-fi` `x=-70, y=25, width=140, height=38.5`; northern star `x=-101, y=-39, width=20, height=20.43`.
+- Stickers inherit the cassette's single parent transform and must never own an independent translate, rotate, scale, pointer handler, or drag state. Drag, insert, and eject move the complete cassette rigidly.
+- The sticker layer sits above the decorative lower panel and below guide/reel hardware. Protect reel holes at radius `20` and lower guide holes at radius `18`; physical hardware must remain readable.
+- Execute and verify this direction from `EMBER_CASSETTE_STICKER_PRODUCTION_EXECUTION_BOOK.md`.
+
+### Ember surface completion lock — v1.0
+
+- The selected surface-completion draft is now the Ember production direction:
+  replace the middle orange registration segment with a shallow upper-center
+  mechanical index plate, keep the left/right orange segments, add sparse
+  alignment ticks, and add one restrained upper-right `01` badge. The badge is
+  a real transparent PNG asset, not JSX `rect`/`path`/`text` geometry.
+- Reduce Ember shell transparency from `.16` to `.20` opacity and add a warmer
+  `.18` inner field so the stage grid is visibly subdued inside the cassette;
+  keep the outer shell edge lighter.
+- Keep all new geometry in `CASSETTE_VISUAL_TOKENS.emberReference` and inside
+  `data-cassette-depth-layer="surface-completion"`. Do not restore the old lower
+  mechanical index, title rail, or legacy manufacturing copy.
+- Preserve the shared `280 × 156` footprint, sticker coordinates, reel/guide
+  clearances, parent transform, cassette lifecycle, and Blue/Cream artwork.
+- The `01` badge remains a fixed `18 × 26` transparent PNG, but its final
+  cassette-local position is `x=93, y=-34`: below/right of the upper orange
+  registration and clear of the white wave line. Do not move or resize the
+  other Ember stickers or mechanical layers with this correction.
+- Execute and verify this direction from
+  `EMBER_CASSETTE_STICKER_PRODUCTION_EXECUTION_BOOK.md`.
+
+### Cassette insert listening variation — v1.0
+
+- Every successful cassette insertion generates a fresh Tone / Space / Texture preset when the cassette reaches the physical `INSERT_TIMING.lockEnd` boundary.
+- The three values are integer percentages in the safe `8–92%` window and are pairwise distinct, so a new cassette never arrives with the same three-shape profile by accident.
+- Tone reuses the existing `400–20,000 Hz` mapping; Space and Texture continue to bind to their existing normalized audio-processing parameters.
+- Invalid drops and cancelled loading motions do not update the preset. Eject does not randomize by itself; the next successful insertion owns the change.
+- Keep the generator in `src/music/tape-variation.js` and preserve the lifecycle seam tests in `tests/tape-variation.test.mjs`.
+
+### Night Soul hybrid reference lock — v2.1
+
+- The direct full-body PNG experiment is superseded. The execution authority is
+  `NIGHT_SOUL_CASSETTE_HYBRID_EXECUTION_BOOK_V2_1.md`.
+- Use the latest reference image selectively: clean transparent PNG assets may
+  carry `NIGHT`, handwritten `soul`, `Lord`, `wait on you`, fog, and abrasion.
+  Do not render the full cassette PNG as the signal body.
+- Preserve the shared 280 × 156 chassis, reel centres ±65, receiver-hole
+  radius 20, HOME geometry, insertion edge, pointer capture, and all cassette
+  lifecycle motion. This remains a signal-branch artwork change only.
+- Rebuild the upper field, non-uniform blue-to-transparent gradient, cobalt
+  shell, mist, abrasion, lower tape route, guides, and centre lock as real
+  cassette-local SVG/material layers.
+- Rebuild signal reel/gear hardware at the existing receiver centres. It must
+  remain rendered for signal, bind to loading/playing/paused/ejecting state, and
+  never be hidden by `display="none"`.
+- The real cassette hole and drag target own geometry and interaction. Decals
+  inherit the parent transform and may not define their own pointer state.
+- The ref-v2 title, mist, abrasion, and torn-strip assets live under
+  `public/assets/night-soul/ref-v2/`; transparent pixels must be genuinely
+  empty, and lower wear may not contain guide or centre-lock geometry.
+- Ember and Cream stay frozen and outside this Night Soul hybrid pass.
+
+### Night Soul visual audit correction — v2.2
+
+This historical correction is superseded by the v2.3 audit contract below.
+
+- Keep the `wait on you` strip below the reel-hole exclusion zone; it may cover
+  lower shell components but must never
+  override either true hole or its functional gear.
+- The torn-strip extractor must remove source blue/reel fragments and leave a
+  genuinely transparent, irregular edge. Do not reuse a crop that still reads
+  as a screenshot fragment.
+- `NIGHT`, `02`, `SIDE B`, and `STEREO` use one distressed warm-print asset
+  treatment. Do not mix distressed PNG title lettering with clean SVG header
+  typography on the same reference surface.
+- Signal reel holes keep the real mask and stateful hardware, but the visible
+  interior is intentionally simple: two opposing marks and a centre annulus;
+  no cardinal tick cage or ornamental over-detail.
+
+### Night Soul reference audit correction — v2.3
+
+- Treat the A–F screenshot audit as the current visual acceptance contract:
+  clear the lower arc residue, align the two lower guide holes, preserve their
+  real functional geometry, and use one horizontal reference line only when a
+  lower structural line is needed.
+- Generate the centre window with a boolean mask: its dark side cutouts use
+  the same outer radius as the signal reel ring, and the window keeps a 4px
+  radius. Move the centre lock down so it has at least 12px of clean space
+  below the upper field.
+- Render the 02/STEREO capsules through one mirrored `SignalCounterCapsule`
+  component. Their 1px header rules share one y baseline and leave the same
+  optical gap around NIGHT; keep the capsules subdued gray-blue rather than
+  pure white.
+- Apply one fixed-size print distress mask to NIGHT, soul, 02, SIDE B and
+  STEREO. The smaller text receives lower opacity, not a smaller grain size.
+  Surface noise comes from one final global monochrome grain layer; remove
+  branch-specific signal grain so the cassette reads as one printed object.
+- Keep the torn strips selective and genuinely transparent. The lower-right
+  strip may cover the lower shell and lower-right components, but its complete
+  extracted artwork must remain inside the valid cassette-local footprint.
+  Add a restrained y+2 / blur 4 / black 8% sticker shadow and keep the strips
+  above reel and lower-mechanism layers so their alpha reveals the hardware
+  underneath without cropping the strip.
+
+### Night Soul edge containment and soft-focus correction — v2.4
+
+- Torn stickers must remain fully inside the shared cassette outer silhouette;
+  never solve overflow by letting a PNG paint beyond the cassette body. This
+  v2.4 clipping/clearance treatment is superseded by v2.5: fit the complete
+  strip through valid local geometry, then let its alpha cover components.
+- The signal field and centre window keep the left-to-right blue direction,
+  but their darkest value sits slightly inside the field rather than at a hard
+  edge. Use a broad blurred radial transition at the perimeter and a restrained
+  dark-centre soft-focus layer; do not flatten the material into a single
+  linear gradient. v2.5 adds the dedicated `soft-focus-texture.png` material
+  layer while keeping the gradient and blur as separate owners.
+- Preserve the 280 × 156 footprint, true holes, functional reel hardware,
+  cassette lifecycle, and the approved decal/material ownership while making
+  this polish pass.
+
+### Night Soul torn-strip and material-texture correction — v2.5
+
+- The lower-right `wait on you` strip is a complete cassette-local decal at
+  `y=28`. Keep its valid geometry inside the cassette footprint; do not crop,
+  clearance-mask, or boolean-cut the strip against reel or guide openings.
+- Render torn strips in a final top sticker layer above lower mechanics and
+  reel hardware. Their extracted alpha plus restrained `.84` opacity lets the
+  components beneath remain faintly visible while the strip still covers
+  them as a physical translucent material.
+- Keep the field's left-to-right blue gradient and soft-focus falloff, but add
+  the real `soft-focus-texture.png` image layer to the field and centre window.
+  The texture is material evidence; it does not replace the SVG gradient,
+  structured blur, or final global grain.
+- Preserve the 280 × 156 footprint, true holes, functional reel hardware,
+  cassette lifecycle, and all unrelated cassette branches.
+
+### Tone dial external-value feedback — v1.0
+
+- The Tone progress arc is value-driven, not input-event-driven. A non-zero external Tone preset must show its orange progress immediately, including randomized cassette insertion values.
+- Keep `data-value-feedback` as interaction observability only; it must not gate `data-progress-visible`.
+
+### Cathedral Dust hybrid reference lock — v1.0
+
+- The selected visual source is `/Users/fuyang/.codex/generated_images/01a01306-6710-7bf0-b2cb-79fc36ce1d69/exec-5c02149d-b766-4be0-9e8d-9eaae2a34451.png`, SHA-256 `c0a1bb096f555df3bc365014cf49186363752d063ffe2b36d58d847341b41ffe`. It replaces only the `cream` / former `paper` artwork mapped to `cathedral-dust`.
+- Preserve the shared `280 × 156` chassis, reel centres at `±65`, true receiver-hole radius `20`, HOME geometry, pointer capture, bay alignment, lid/jaw/camera sequence, front state and eject lifecycle. Ember and Night Soul remain frozen.
+- Use a hybrid renderer: transparent PNG assets own the warm ivory shell material, black wound media, pale aqua reel surfaces, handwritten `Cathedral Dust` engraving, lower clear mechanism, scratches and wear; SVG/code owns the silhouette, true holes, reel pivots and rotation, parent transform, interaction, masks, hold ring and separate shadow.
+- Build a transparent `1120 × 624` production master before JSX integration. Reconcile the source/prototype ratio by content-aware horizontal material extension; never use runtime non-uniform stretching or `preserveAspectRatio="none"`.
+- The upper-right shell carries the official SPOOL reel mark using exact geometry from `public/mark.svg`, adapted as a restrained same-material engraving. Do not ship the generated approximation, the `spool.` wordmark or a filled-centre substitute.
+- All visual layers inherit one cassette parent transform. Texture, title, mark and wear may not own independent stage-space transforms, pointer handlers, visibility timing or lifecycle state.
+- The former paper ribs, generic central title card, visible `03` and bottom decorative strip are superseded, but remove them only after the exact-ratio production master and Cathedral hybrid branch pass their gates.
+- Execute one task at a time from `CATHEDRAL_DUST_CASSETTE_IMAGE_TO_CODE_PRODUCTION_EXECUTION_BOOK_V1.md`. Same-state visual comparison is required; passing tests cannot substitute for a visibly correct result.
+
+### Cathedral Dust lower-right edition engraving — v1.2
+
+- The latest Cathedral Dust refinement adds one small engraved `03` at the
+  lower-right of the cassette face, matching the connected handwritten style
+  and the same `cathedral-engraving-emboss` treatment used by `Cathedral Dust`.
+- The number is a transparent raster asset at
+  `public/assets/cathedral-dust/ref-v1/edition-03-engraving.png`; the browser
+  must not depend on a locally installed handwriting font.
+- Its cassette-local box is `x=101, y=22, width=28, height=16`. It remains
+  inside the shared `280 × 156` body, outside the reel and lower-guide
+  clearance zones, and inherits the single cassette parent transform.
+- This latest request supersedes the earlier Cathedral rule that removed all
+  visible `03` copy. Do not restore the old central title-card or decorative
+  strip treatment; the lower-right engraving is the only permitted number.
+
+### Night Soul sticker composition correction — v2.6
+
+- The supplied Night/Soul sticker is the visual authority for this local logo
+  replacement. Keep its architecture: one large fuzzy blue/ivory `Night`
+  mark above, with a separate small dark slanted `Soul` patch at lower-left.
+  Do not place `Soul` on top of, inside, or directly beneath the centre of
+  `Night`.
+- `Soul` must continue to use the existing handwritten asset at
+  `public/assets/night-soul/ref-v2/soul-script.png`; only its label container
+  and relative placement change. The label is a separate cassette-local
+  surface, not a replacement font rendered as generic text.
+- `Night` uses the generated `ref-v3/night-glow.png` asset. Its blue fog may
+  remain soft and low-alpha, but the bright parts of the lettering must carry
+  a visible warm-ivory negative form so the word remains legible against the
+  cobalt signal cassette.
+- Keep soft-focus as a local material atmosphere around the logo and existing
+  signal field. Do not add a full rectangular blue plate, global blur, new
+  sticker architecture, or changes to the cassette footprint, reels, holes,
+  drag, insertion, eject, or animation lifecycle.
+
+### Night Soul open layout exploration — v3.0
+
+- This phase deliberately releases the former upper-centred title layout.
+  `Night`, `Soul`, `02`, `SIDE B`, `STEREO`, negative space, light direction,
+  and information rails may be recomposed after a generated direction is
+  explicitly selected.
+- The emotional target is a quiet midnight field opened by one electric-cobalt
+  soft-focus light event: intimate, weightless, melancholic and releasing.
+  Avoid generic cyberpunk neon, busy poster density and decorative microcopy.
+- The immutable visual/physical anchors are the shared cassette silhouette,
+  true receiver holes, reel centres and hardware, lower guides, centre lock,
+  cassette lifecycle, plus the existing complete `Lord` and `wait on you`
+  translucent torn stickers in their approved cassette-local positions.
+- Torn stickers remain topmost surface layers and may reveal mechanics through
+  alpha. They may not be cropped, rewritten or moved to solve a composition.
+- Every candidate must remain image-to-code feasible: identity typography and
+  torn strips may become transparent PNG decals; gradients, light fields,
+  mist, contour texture and grain should retain separate SVG/material owners.
+- The current ImageGen explorations are preview directions only: `Middle
+  Signal`, `Quiet Offset`, and `Blue Column`. Do not modify `src/` or promote
+  one as production truth until the user chooses an exact image.
+
+### Night Soul Blue Column material-density correction — v3.1
+
+- The selected exploration is `Blue Column`, but its central electric-blue
+  light field must read as one damaged translucent blue adhesive-tape decal,
+  not as a smooth rectangular gradient or a generic glow placed on the shell.
+- Keep that strip in the safe central zone between the two fixed reels. Its
+  material vocabulary is torn fibres, irregular missing bites, broken corners,
+  wrinkles, trapped-air bubbles, glue bloom, rubbed ink, fine scratches,
+  partial transparency and a restrained contact shadow. `Night` and `Soul`
+  remain part of this central tape composition and stay clearly legible.
+- Increase visual density through purposeful, code-rebuildable mechanical
+  registration: inset rails, alignment ticks, paired capsule windows, molded
+  ribs, recessed fasteners, bracket seams, interrupted rules and coarse signal
+  blocks. Do not substitute arbitrary sci-fi microcopy or move the real holes.
+- Maintain hybrid layer ownership. The damaged blue tape, title printing and
+  the two existing torn stickers may be transparent PNG decals; the shell,
+  true receiver holes, reel hardware, lower guides, centre lock, rails and
+  seams remain SVG/code; fog, wear and global grain remain separate overlays.
+- Preserve the shared cassette silhouette, fixed reel/hole geometry, complete
+  topmost `Lord` and `wait on you` stickers, and the full interaction lifecycle.
+  This remains an image-only visual anchor until explicitly approved; do not
+  modify `src/` from the exploration alone.
+
+### Night Soul Blue Reel production lock — v4.0
+
+- The selected Night Soul visual source is
+  `artifacts/night-soul/ref-v4/night-soul-blue-reel-selected.png`, SHA-256
+  `726696f70fb812e472c8f17a3314044dfa69f1cb45716716f8a7ecd4a6f3eb66`.
+  It promotes the transparent electric-blue shell, two oversized ivory reel
+  faces, handwritten `Night` / `Soul`, upper-left `Lord` strip and lower-right
+  `wait on you` strip from exploration into the next production direction.
+- Execute this direction one Task at a time from
+  `NIGHT_SOUL_BLUE_REEL_IMAGE_TO_CODE_EXECUTION_BOOK_V4.md`. Start with Task 00
+  and record the dirty-worktree baseline before editing `src/` or generating
+  runtime assets.
+- Preserve the shared `280 × 156` cassette, reel centres at `±65`, true
+  receiver-hole radius `20`, one parent transform, drag/insert/eject lifecycle,
+  and the Ember/Cathedral branches. Reconcile the selected raster to these
+  anchors; never non-uniformly stretch a full cassette image.
+- Use a hybrid renderer. SVG/code owns shell geometry, real holes, oversized
+  rotating reel faces, the three face apertures, lower mechanics, guides,
+  centre lock, colour fields and motion. Pivot-local transparent PNGs own the
+  irregular reel printing; transparent overlays own fog, wear and grain; the
+  two complete torn strips remain topmost decals.
+- The visible reel print is exactly `Night`, `Soul`, `02`, `SIDE B` and
+  `STEREO`. Both handwritten titles are physically attached to their reel
+  faces and rotate with them. No commercial branding, URLs or invented
+  microcopy may enter the production branch.

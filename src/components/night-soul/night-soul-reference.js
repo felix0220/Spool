@@ -1,0 +1,65 @@
+export const NIGHT_SOUL_REF_V4 = Object.freeze({
+  version: 'ref-v4',
+  master: Object.freeze({ width: 1120, height: 624, runtimeScale: 4 }),
+  bodyClip: Object.freeze({ x: -140, y: -78, width: 280, height: 156, rx: 11 }),
+  reel: Object.freeze({
+    centerX: 65,
+    faceRadius: 50,
+    holeRadius: 20,
+    plateFill: '#EEECE5',
+    plateEdge: '#F8F3E9',
+    ink: '#123A80',
+    apertures: Object.freeze([
+      Object.freeze({ x: -20, y: -14, width: 27, height: 21, rx: 7, rotation: -35 }),
+      Object.freeze({ x: 20, y: -14, width: 27, height: 21, rx: 7, rotation: 35 }),
+      Object.freeze({ x: 0, y: 20, width: 28, height: 18, rx: 7, rotation: 0 }),
+    ]),
+  }),
+  guides: Object.freeze({ leftX: -94, rightX: 94, y: 49, outerRadius: 13, innerRadius: 8 }),
+  centerLock: Object.freeze({ x: 0, y: 50, radius: 7 }),
+  prints: Object.freeze({
+    left: Object.freeze({ href: '/assets/night-soul/ref-v4/left-reel-print.png', x: -50, y: -50, width: 100, height: 100 }),
+    right: Object.freeze({ href: '/assets/night-soul/ref-v4/right-reel-print.png', x: -50, y: -50, width: 100, height: 100 }),
+    grain: '/assets/night-soul/ref-v4/reel-face-grain.png',
+  }),
+  stickers: Object.freeze({
+    lord: Object.freeze({ href: '/assets/night-soul/ref-v2/lord-strip.png', x: -127, y: -66, width: 72, height: 30 }),
+    waitOnYou: Object.freeze({ href: '/assets/night-soul/ref-v2/wait-on-you-strip.png', x: 12, y: 37, width: 113, height: 38 }),
+  }),
+  textures: Object.freeze({
+    fog: '/assets/night-soul/ref-v4/shell-fog-overlay.png',
+    edgeWear: '/assets/night-soul/ref-v4/shell-edge-wear.png',
+    glow: '/assets/night-soul/ref-v4/electric-glow-texture.png',
+    grain: '/assets/night-soul/ref-v4/surface-grain.png',
+  }),
+  colors: Object.freeze({
+    rearMedia: '#03122F',
+    shellCyan: '#00A9E8',
+    shellCobalt: '#0750C7',
+    shellDeep: '#04256F',
+    shellBlueBlack: '#061630',
+  }),
+  layerOrder: Object.freeze([
+    'rear-media',
+    'lower-mechanical-substrate',
+    'translucent-shell-field',
+    'electric-glow-texture',
+    'shell-fog-overlay',
+    'molded-seams',
+    'functional-reel-face',
+    'lower-guide-hardware',
+    'shell-edge-wear',
+    'top-stickers',
+    'surface-grain',
+  ]),
+});
+
+export const NIGHT_SOUL_REF_V4_ASSET_PATHS = Object.freeze([
+  NIGHT_SOUL_REF_V4.prints.left.href,
+  NIGHT_SOUL_REF_V4.prints.right.href,
+  NIGHT_SOUL_REF_V4.prints.grain,
+  NIGHT_SOUL_REF_V4.textures.fog,
+  NIGHT_SOUL_REF_V4.textures.edgeWear,
+  NIGHT_SOUL_REF_V4.textures.glow,
+  NIGHT_SOUL_REF_V4.textures.grain,
+]);

@@ -226,9 +226,7 @@ function ToneDial({
         data-state={disabled ? 'disabled' : interactionState}
         data-value={safeValue.toFixed(2)}
         data-value-feedback={hasValueFeedback ? 'visible' : 'hidden'}
-        data-progress-visible={controlKind === 'tone-dial'
-          ? (hasValueFeedback ? 'visible' : 'hidden')
-          : (normalizedValue > 0 ? 'visible' : 'hidden')}
+        data-progress-visible={normalizedValue > 0 ? 'visible' : 'hidden'}
         style={{ '--dial-accent': accent }}
         pointerEvents="none"
         aria-hidden="true"

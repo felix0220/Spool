@@ -8,6 +8,7 @@ import { getTrackByCassetteId, getTrackById } from '../music/tracks.js';
 import { snapshotCapture } from '../music/material-capture.js';
 import { useSignalLevel } from '../music/useSignalLevel.js';
 import { AUDIO_LOAD_STATUS } from '../music/audio-source-lifecycle.js';
+import { createRandomTapeVariation } from '../music/tape-variation.js';
 import {
   clientToDesignPoint,
   designToWorld,
@@ -35,6 +36,8 @@ import {
   canDispatchFrontIntent,
 } from './front/action-contract.js';
 import { LidSurfaceDetails, TopSurfaceDetails } from './industrial/TopSurfaceDetails.jsx';
+import { NIGHT_SOUL_REF_V4 } from './night-soul/night-soul-reference.js';
+import NightSoulSignalCassette from './night-soul/NightSoulSignalCassette.jsx';
 
 const W = WORLD_VIEWPORT.width;
 const H = WORLD_VIEWPORT.height;
@@ -69,6 +72,31 @@ const easeInOut = (t) => {
 const pointLerp = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
 const points = (a, b, t) => a.map((p, i) => pointLerp(p, b[i], t).join(',' )).join(' ');
 const pointList = (list) => list.map(([x, y]) => `${x},${y}`).join(' ');
+const roundedQuadPath = (vertices, radius) => {
+  const corners = vertices.map((vertex, index) => {
+    const previous = vertices[(index + vertices.length - 1) % vertices.length];
+    const next = vertices[(index + 1) % vertices.length];
+    const previousLength = Math.hypot(vertex[0] - previous[0], vertex[1] - previous[1]) || 1;
+    const nextLength = Math.hypot(next[0] - vertex[0], next[1] - vertex[1]) || 1;
+    const inset = Math.min(radius, previousLength / 2, nextLength / 2);
+    return {
+      vertex,
+      entry: [
+        vertex[0] + ((previous[0] - vertex[0]) / previousLength) * inset,
+        vertex[1] + ((previous[1] - vertex[1]) / previousLength) * inset,
+      ],
+      exit: [
+        vertex[0] + ((next[0] - vertex[0]) / nextLength) * inset,
+        vertex[1] + ((next[1] - vertex[1]) / nextLength) * inset,
+      ],
+    };
+  });
+  const pathPoint = ([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`;
+  return corners.reduce((path, corner, index) => {
+    const segment = `${index === 0 ? `M${pathPoint(corner.entry)}` : `L${pathPoint(corner.entry)}`} Q${pathPoint(corner.vertex)} ${pathPoint(corner.exit)}`;
+    return path + segment;
+  }, '') + ' Z';
+};
 const qBezier = (a, c, b, t) => [
   lerp(lerp(a[0], c[0], t), lerp(c[0], b[0], t), t),
   lerp(lerp(a[1], c[1], t), lerp(c[1], b[1], t), t),
@@ -92,6 +120,8 @@ const FRONT_EDGE = [[430, 458], [850, 458], [808, 505], [472, 505]];
 const FRONT_FULL = [[232, 156], [1048, 156], [1048, 634], [232, 634]];
 const SLOT_CLOSED = [[456, 250], [824, 250], [824, 416], [456, 416]];
 const SLOT_OPEN = [[500, 236], [780, 236], [758, 390], [522, 390]];
+const TOP_SURFACE_RADIUS = 15;
+const TOP_PANEL_RADIUS = 12;
 
 // Cassette Intake Core contract. Every visual and interaction target below
 // derives from these anchors; the drag hit area is intentionally separate from
@@ -102,6 +132,228 @@ const CASSETTE_SPEC = {
   reelCenterX: 65,
   reelHoleRadius: 20,
 };
+const CASSETTE_VISUAL_TOKENS = Object.freeze({
+  titleFontSize: 11,
+  editionFontSize: 10,
+  primaryFeatureStroke: 3,
+  secondarySeamStroke: 2,
+  emberSurfaceStroke: 1.5,
+  emberReference: Object.freeze({
+    outerFrame: '#E7D9C7',
+    outerFrameStroke: '#CBB8A0',
+    shellFill: '#F1C78E',
+    // The selected surface-completion draft uses a less transparent inner
+    // field so the stage grid reads as background, not as cassette texture.
+    shellOpacity: .20,
+    innerFieldFill: '#C18868',
+    innerFieldOpacity: .18,
+    shellStroke: '#FFF5E8',
+    shellStrokeOpacity: .62,
+    innerSeam: '#FFF8EE',
+    media: '#171617',
+    mediaEdge: '#4B3023',
+    hub: '#F56A2A',
+    hubHighlight: '#FFE4C8',
+    tape: '#8C3E1C',
+    signal: '#F56A2A',
+    signalHighlight: '#FFE4C8',
+    signalSegments: Object.freeze([
+      Object.freeze({ x: -112, width: 20 }),
+      Object.freeze({ x: 92, width: 20 }),
+    ]),
+    signalY: -48,
+    signalHeight: 4,
+    frameStroke: 2,
+    shellStrokeWidth: 1.5,
+    seamStroke: 1.25,
+    mediaLeftRadius: 52,
+    mediaRightRadius: 52,
+    reelOuterRadius: 23,
+    reelInnerRadius: 19,
+    guideLeftX: -94,
+    guideRightX: 94,
+    guideY: 49,
+    guideOuterRadius: 13,
+    guideInnerRadius: 8,
+    reelClearanceRadius: 29,
+    guideClearanceRadius: 18,
+    tapeStroke: 2.2,
+    surfaceCompletion: Object.freeze({
+      indexPlate: Object.freeze({ x: -25, y: -43, width: 50, height: 13, rx: 3 }),
+      indexGrooves: Object.freeze([
+        Object.freeze({ x: -18, y: -39, width: 36 }),
+        Object.freeze({ x: -16, y: -35, width: 32 }),
+        Object.freeze({ x: -14, y: -31, width: 28 }),
+      ]),
+      indexTicks: Object.freeze([
+        Object.freeze({ x: -33, y: -37, width: 4, height: 1.5 }),
+        Object.freeze({ x: 29, y: -37, width: 4, height: 1.5 }),
+        Object.freeze({ x: -1, y: -50, width: 2, height: 5 }),
+        Object.freeze({ x: -1, y: -27, width: 2, height: 5 }),
+      ]),
+      badge: Object.freeze({
+        href: '/assets/ember-stickers/edition-01-badge.png',
+        x: 93,
+        y: -34,
+        width: 18,
+        height: 26,
+      }),
+    }),
+  }),
+  signalReference: Object.freeze({
+    version: 'ref-v2',
+    // The ref-v2 source contributes only clean printed and surface texture.
+    // Body geometry, holes, reel hardware, field and lower mechanism remain
+    // product-owned layers.
+    decals: Object.freeze({
+      nightTitle: Object.freeze({
+        href: '/assets/night-soul/ref-v3/night-glow.png',
+        x: -61,
+        y: -71,
+        width: 122,
+        height: 48,
+      }),
+      soulScript: Object.freeze({
+        href: '/assets/night-soul/ref-v2/soul-script.png',
+        x: -18,
+        y: -45,
+        width: 36,
+        height: 15,
+      }),
+      soulSticker: Object.freeze({
+        x: -54,
+        y: -31,
+        width: 48,
+        height: 14,
+        rotation: -8,
+      }),
+      lordStrip: Object.freeze({
+        href: '/assets/night-soul/ref-v2/lord-strip.png',
+        x: 64,
+        y: -39,
+        width: 73,
+        height: 36,
+      }),
+      waitOnYouStrip: Object.freeze({
+        href: '/assets/night-soul/ref-v2/wait-on-you-strip.png',
+        x: 31,
+        y: 28,
+        width: 104,
+        height: 43,
+      }),
+      edition02: Object.freeze({
+        href: '/assets/night-soul/ref-v2/edition-02.png',
+        x: -113,
+        y: -50,
+        width: 22,
+        height: 11,
+      }),
+      sideB: Object.freeze({
+        href: '/assets/night-soul/ref-v2/side-b.png',
+        x: -112,
+        y: -31,
+        width: 39,
+        height: 12,
+      }),
+      stereo: Object.freeze({
+        href: '/assets/night-soul/ref-v2/stereo.png',
+        x: 76,
+        y: -50,
+        width: 35,
+        height: 11,
+      }),
+    }),
+    textures: Object.freeze({
+      mistLeft: '/assets/night-soul/ref-v2/mist-overlay.png',
+      mistRight: '/assets/night-soul/ref-v2/mist-right-overlay.png',
+      edgeWear: '/assets/night-soul/ref-v2/edge-wear-overlay.png',
+      lowerMechanismWear: '/assets/night-soul/ref-v2/lower-mechanism-wear.png',
+      printDistressMask: '/assets/night-soul/ref-v2/print-distress-mask.png',
+      softFocusTexture: '/assets/night-soul/ref-v2/soft-focus-texture.png',
+      globalGrain: '/assets/night-soul/ref-v2/global-grain.png',
+    }),
+  }),
+  signalReferenceV4: NIGHT_SOUL_REF_V4,
+  identityPlate: Object.freeze({ x: -46, y: -31, width: 92, height: 62 }),
+  cathedralReference: Object.freeze({
+    version: 'ref-v1',
+    master: Object.freeze({ width: 1120, height: 624, scale: 4 }),
+    reelCenterX: 65,
+    reelHoleRadius: 20,
+    bodyClip: Object.freeze({ x: -140, y: -78, width: 280, height: 156, rx: 11 }),
+    layerOpacity: Object.freeze({ rearMedia: 1, shell: 1 }),
+    surfaceWear: Object.freeze({ opacity: .34, blendMode: 'soft-light' }),
+    engravingOpacity: Object.freeze({ title: .92, mark: .74 }),
+    assets: Object.freeze({
+      shell: '/assets/cathedral-dust/ref-v1/shell-substrate.png',
+      rearMedia: '/assets/cathedral-dust/ref-v1/rear-media.png',
+      reelLeft: '/assets/cathedral-dust/ref-v1/reel-left-surface.png',
+      reelRight: '/assets/cathedral-dust/ref-v1/reel-right-surface.png',
+      lowerMechanism: '/assets/cathedral-dust/ref-v1/lower-mechanism.png',
+      title: '/assets/cathedral-dust/ref-v1/title-engraving.png',
+      edition: '/assets/cathedral-dust/ref-v1/edition-03-engraving.png',
+      surfaceWear: '/assets/cathedral-dust/ref-v1/surface-wear.png',
+      fastener: '/assets/cathedral-dust/ref-v1/brass-fastener.png',
+      spoolMark: '/mark.svg',
+    }),
+    title: Object.freeze({ x: -119.25, y: -57.75, width: 162.75, height: 20 }),
+    edition: Object.freeze({ x: 101, y: 22, width: 28, height: 16 }),
+    fasteners: Object.freeze([
+      Object.freeze({ x: -130.5, y: -69 }),
+      Object.freeze({ x: 130.5, y: -69 }),
+      Object.freeze({ x: -130.5, y: 69 }),
+      Object.freeze({ x: 130.5, y: 69 }),
+      Object.freeze({ x: 0, y: 52 }),
+    ]),
+  }),
+});
+const EMBER_STICKER_LAYOUT = Object.freeze({
+  // These are cassette-local coordinates. The parent cassette transform owns
+  // every translation, rotation and scale, so the stickers cannot drift or
+  // deform independently during drag, insertion or eject motion.
+  chillLofi: Object.freeze({
+    href: '/assets/ember-stickers/chill-lofi-moon-star.png',
+    x: -70,
+    y: 25,
+    width: 140,
+    height: 38.5,
+  }),
+  northernStar: Object.freeze({
+    href: '/assets/ember-stickers/northern-star.png',
+    x: -101,
+    y: -39,
+    width: 20,
+    height: 20.43,
+  }),
+  protectedZones: Object.freeze({
+    reelRadius: 20,
+    guideCenterX: 94,
+    guideRadius: 18,
+  }),
+});
+const CASSETTE_EDITIONS = Object.freeze({
+  ribbed: Object.freeze({
+    number: '01',
+    identityFill: '#E7D7C8',
+    identityStroke: '#8E5546',
+    identityText: '#2E211E',
+    editionText: '#F3E8DC',
+  }),
+  signal: Object.freeze({
+    number: '02',
+    identityFill: '#253153',
+    identityStroke: '#778BC6',
+    identityText: '#F0EDE4',
+    editionText: '#DCE3F7',
+  }),
+  paper: Object.freeze({
+    number: '03',
+    identityFill: '#DED9CD',
+    identityStroke: '#AAA398',
+    identityText: '#2A2A27',
+    editionText: '#5F5C55',
+  }),
+});
 const INTAKE = {
   centerX: 640,
   receiverY: 335,
@@ -150,11 +402,153 @@ const HOME = [
 
 const EMPTY_TAPES = HOME.map((t) => ({ ...t, visible: true }));
 
+function SignalCounterCapsule({ centerX, y, mirrored = false }) {
+  return (
+    <g
+      data-cassette-counter="capsule"
+      data-cassette-counter-mirrored={mirrored ? 'true' : 'false'}
+      transform={`translate(${centerX} ${y}) scale(${mirrored ? -1 : 1} 1)`}
+      pointerEvents="none"
+    >
+      <rect
+        x="-9"
+        y="0"
+        width="18"
+        height="5"
+        rx="2.5"
+        fill="#AAB6CD"
+        fillOpacity=".2"
+        stroke="#AAB6CD"
+        strokeWidth=".7"
+        opacity=".74"
+      />
+    </g>
+  );
+}
+
 function toStagePoint(event, node) {
   return designToWorld(clientToDesignPoint(event, node));
 }
 
-function CassetteGraphic({ tape, onPointerDown, onKeyDown, interactive = true, holding = false }) {
+function CathedralDustArtwork({ reelTurn = 0 }) {
+  const reference = CASSETTE_VISUAL_TOKENS.cathedralReference;
+  const fullCanvas = { x: -140, y: -78, width: 280, height: 156 };
+  return (
+    <g
+      data-cassette-art="cathedral-dust-ref-v1"
+      pointerEvents="none"
+      clipPath="url(#cathedral-dust-body-clip)"
+    >
+      <g data-cathedral-layer="rear-media" opacity={reference.layerOpacity.rearMedia}>
+        <image href={reference.assets.rearMedia} {...fullCanvas} preserveAspectRatio="xMidYMid meet" />
+      </g>
+      <g data-cathedral-layer="lower-mechanism">
+        <image data-cathedral-element="lower-mechanism" href={reference.assets.lowerMechanism} {...fullCanvas} preserveAspectRatio="xMidYMid meet" />
+      </g>
+      <g data-cathedral-layer="shell-substrate" opacity={reference.layerOpacity.shell}>
+        <image href={reference.assets.shell} {...fullCanvas} preserveAspectRatio="xMidYMid meet" />
+      </g>
+      <g
+        data-cathedral-layer="surface-wear"
+        opacity={reference.surfaceWear.opacity}
+        style={{ mixBlendMode: reference.surfaceWear.blendMode }}
+      >
+        <image href={reference.assets.surfaceWear} {...fullCanvas} preserveAspectRatio="xMidYMid meet" />
+      </g>
+      <g
+        data-cathedral-layer="reel-left-surface"
+        data-reel-motion="cathedral"
+        transform={`translate(${-reference.reelCenterX} 0) rotate(${reelTurn * -1})`}
+      >
+        <image
+          data-cathedral-element="reel-left-surface"
+          href={reference.assets.reelLeft}
+          x="-28"
+          y="-28"
+          width="56"
+          height="56"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+      <g
+        data-cathedral-layer="reel-right-surface"
+        data-reel-motion="cathedral"
+        transform={`translate(${reference.reelCenterX} 0) rotate(${reelTurn})`}
+      >
+        <image
+          data-cathedral-element="reel-right-surface"
+          href={reference.assets.reelRight}
+          x="-28"
+          y="-28"
+          width="56"
+          height="56"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+      <g data-cathedral-layer="title-engraving">
+        <image
+          href={reference.assets.title}
+          x={reference.title.x}
+          y={reference.title.y}
+          width={reference.title.width}
+          height={reference.title.height}
+          opacity={reference.engravingOpacity.title}
+          filter="url(#cathedral-engraving-emboss)"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+      <g data-cathedral-layer="edition-03-engraving">
+        <image
+          data-cathedral-element="edition-03-engraving"
+          href={reference.assets.edition}
+          x={reference.edition.x}
+          y={reference.edition.y}
+          width={reference.edition.width}
+          height={reference.edition.height}
+          opacity={reference.engravingOpacity.title}
+          filter="url(#cathedral-engraving-emboss)"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+      <g data-cathedral-layer="official-SPOOL-mark-vector">
+        <image
+          href={reference.assets.spoolMark}
+          x="93"
+          y="-61"
+          width="24"
+          height="24"
+          opacity={reference.engravingOpacity.mark}
+          filter="url(#cathedral-engraving-emboss)"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+      <g data-cathedral-layer="brass-fastener">
+        {reference.fasteners.map((fastener, index) => (
+          <image
+            key={index}
+            href={reference.assets.fastener}
+            x={fastener.x - 8}
+            y={fastener.y - 8}
+            width="16"
+            height="16"
+            data-cathedral-element="brass-fastener"
+            preserveAspectRatio="xMidYMid meet"
+          />
+        ))}
+      </g>
+    </g>
+  );
+}
+
+function CassetteGraphic({
+  tape,
+  onPointerDown,
+  onKeyDown,
+  interactive = true,
+  holding = false,
+  playing = false,
+  reducedMotion = false,
+}) {
   const reelTurn = tape.reelTurn ?? 0;
   const accent = tape.accent ?? COLORS.orange;
   const frameColor = tape.frameColor ?? '#3A3837';
@@ -162,7 +556,36 @@ function CassetteGraphic({ tape, onPointerDown, onKeyDown, interactive = true, h
   const reelX = CASSETTE_SPEC.reelCenterX;
   const track = tape.trackId ? getTrackById(tape.trackId) : null;
   const titleLines = track?.labelLines ?? ['SIDE', 'A'];
-  const titleSize = titleLines[1]?.length > 10 ? 5.4 : 6.4;
+  const edition = CASSETTE_EDITIONS[tape.variant] ?? CASSETTE_EDITIONS.ribbed;
+  const identityPlate = CASSETTE_VISUAL_TOKENS.identityPlate;
+  const isEmber = tape.variant === 'ribbed';
+  const isSignal = tape.variant === 'signal';
+  const isCathedralDust = tape.id === 'cream' && tape.trackId === 'cathedral-dust';
+  const emberReference = CASSETTE_VISUAL_TOKENS.emberReference;
+  const signalReference = CASSETTE_VISUAL_TOKENS.signalReference;
+  const cassetteFrameFill = isEmber ? emberReference.outerFrame : (isSignal ? '#2459B8' : COLORS.ink);
+  const cassetteFrameStroke = isEmber
+    ? emberReference.outerFrameStroke
+    : isSignal ? '#0D2E82' : COLORS.inkDeep;
+  const cassetteShellFill = isEmber ? emberReference.shellFill : (isSignal ? '#2458B1' : tape.tint);
+  const cassetteShellStroke = isEmber
+    ? emberReference.outerFrameStroke
+    : isSignal ? '#7EA5EB' : frameColor;
+  const cassetteShellOpacity = isEmber ? emberReference.shellOpacity : isSignal ? .86 : 1;
+  const reelAccent = isEmber ? emberReference.hub : accent;
+  if (isSignal) {
+    return (
+      <NightSoulSignalCassette
+        tape={tape}
+        onPointerDown={onPointerDown}
+        onKeyDown={onKeyDown}
+        interactive={interactive}
+        holding={holding}
+        playing={playing}
+        reducedMotion={reducedMotion}
+      />
+    );
+  }
   return (
     <g
       className="graphic-tape-entity"
@@ -193,6 +616,7 @@ function CassetteGraphic({ tape, onPointerDown, onKeyDown, interactive = true, h
       data-variant={tape.variant}
       data-track-id={tape.trackId || undefined}
       data-art-variant={tape.artVariant || undefined}
+      data-cassette-art={isCathedralDust ? 'cathedral-dust-ref-v1' : undefined}
       data-holding={holding ? 'true' : undefined}
       onPointerDown={interactive ? onPointerDown : undefined}
       onKeyDown={interactive ? onKeyDown : undefined}
@@ -204,81 +628,599 @@ function CassetteGraphic({ tape, onPointerDown, onKeyDown, interactive = true, h
         className={interactive ? 'graphic-tape-idle-drift' : undefined}
         style={interactive ? { '--idle-delay': `${-tape.phase / 1.35}s` } : undefined}
       >
+        <rect
+          data-cassette-drag-hit="true"
+          x="-140"
+          y="-78"
+          width="280"
+          height="156"
+          rx="11"
+          fill="transparent"
+          pointerEvents={interactive ? 'all' : 'none'}
+        />
         <g mask="url(#cassette-reel-cutouts)">
-          <rect x="-140" y="-80" width="280" height="156" rx="11" fill={COLORS.ink} stroke={COLORS.inkDeep} strokeWidth="3" />
-          <rect x="-128" y="-68" width="256" height="136" rx="7" fill={tape.tint} stroke={frameColor} strokeWidth="2" />
-          <rect x="-128" y="-68" width="256" height="136" rx="7" fill="url(#cassette-rib)" opacity={tape.variant === 'ribbed' ? .3 : .12} />
-          <rect x="-119" y="-59" width="238" height="118" rx="5" fill="none" stroke={labelTint} strokeWidth="1.5" opacity=".34" />
-          <rect x="-88" y="-44" width="176" height="88" rx="3" fill={labelTint} stroke="#C8C5BB" strokeWidth="1.5" />
-          <rect x="-88" y="9" width="176" height="3" rx="2" fill="#AAA9A2" opacity=".82" />
-          <path d="M-72 24H72" stroke={accent} strokeWidth="3" opacity=".72" />
-          <g className="graphic-tape-title" fill={COLORS.ink} textAnchor="middle" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing=".7" pointerEvents="none">
-            <text x="0" y="-18" fontSize={titleSize} fontWeight="700">{titleLines[0]}</text>
-            <text x="0" y="-3" fontSize={titleSize} fontWeight="700">{titleLines[1]}</text>
-          </g>
-          <g className="graphic-tape-motif" fill="none" stroke={accent} strokeLinecap="round" strokeLinejoin="round" pointerEvents="none">
-            {tape.artVariant === 'bloom-signal' && (
-              <>
-                <path d="M-110 34C-92 22-80 44-64 30S-30 41-12 25 20 41 40 28 75 43 108 28" strokeWidth="2.2" opacity=".78" />
-                <circle cx="0" cy="30" r="5" strokeWidth="1.6" opacity=".7" />
-                <path d="M-105-34H-86M86-34H105" strokeWidth="2" opacity=".76" />
-              </>
-            )}
-            {tape.artVariant === 'night-grid' && (
-              <>
-                <path d="M-106-38V-26M-88-38V-26M88-38V-26M106-38V-26" strokeWidth="1.7" opacity=".72" />
-                <path d="M-106 30H-82M82 30H106M-106 36H-72M72 36H106" strokeWidth="1.8" opacity=".7" />
-                <path d="M-43-34V-24M-30-34V-24M30-34V-24M43-34V-24" strokeWidth="1.2" opacity=".66" />
-              </>
-            )}
-            {tape.artVariant === 'cathedral-ribs' && (
-              <>
-                <path d="M-108 34V24M-96 34V20M-84 34V16M84 34V16M96 34V20M108 34V24" strokeWidth="2" opacity=".72" />
-                <path d="M-108-36C-92-21-80-21-64-36M64-36C80-21 92-21 108-36" strokeWidth="1.7" opacity=".72" />
-                <path d="M-48 34C-38 24-28 24-18 34M18 34C28 24 38 24 48 34" strokeWidth="1.5" opacity=".62" />
-              </>
-            )}
-          </g>
+          {isCathedralDust && <CathedralDustArtwork reelTurn={reelTurn} />}
+          <g display={isCathedralDust ? 'none' : undefined}>
+          <rect
+            data-cassette-depth-layer="outer-frame"
+            x="-140"
+            y="-80"
+            width="280"
+            height="156"
+            rx="11"
+            fill={cassetteFrameFill}
+            opacity={isEmber ? .72 : 1}
+            stroke={cassetteFrameStroke}
+            strokeWidth={isEmber ? emberReference.frameStroke : 3}
+          />
+          <rect
+            data-cassette-depth-layer="shell-base"
+            x="-128"
+            y="-68"
+            width="256"
+            height="136"
+            rx="7"
+            fill={cassetteShellFill}
+            opacity={cassetteShellOpacity}
+            stroke={isEmber ? emberReference.shellStroke : cassetteShellStroke}
+            strokeOpacity={isEmber ? emberReference.shellStrokeOpacity : 1}
+            strokeWidth={isEmber ? emberReference.shellStrokeWidth : 2}
+          />
+          <rect
+            x="-119"
+            y="-59"
+            width="238"
+            height="118"
+            rx="5"
+            fill="none"
+            stroke={isEmber ? emberReference.innerSeam : labelTint}
+            strokeWidth={isEmber ? emberReference.seamStroke : CASSETTE_VISUAL_TOKENS.secondarySeamStroke}
+            opacity={isEmber ? .42 : .38}
+          />
+
+          {tape.variant === 'ribbed' && (
+            <g className="graphic-tape-material graphic-tape-material--ribbed graphic-tape-material--ember-reference" data-cassette-material="ribbed">
+              <g data-cassette-depth-layer="rear-media" pointerEvents="none">
+                <circle cx="-65" cy="-3" r={emberReference.mediaLeftRadius} fill={emberReference.media} opacity=".94" />
+                <circle cx="65" cy="-3" r={emberReference.mediaRightRadius} fill={emberReference.media} opacity=".9" />
+                <circle cx="-65" cy="-3" r="47" fill="none" stroke={emberReference.mediaEdge} strokeWidth="1.5" opacity=".64" />
+                <circle cx="65" cy="-3" r="47" fill="none" stroke={emberReference.mediaEdge} strokeWidth="1.5" opacity=".56" />
+              </g>
+
+              <g data-cassette-depth-layer="tape-route" pointerEvents="none">
+                <path
+                  data-cassette-element="tape-route"
+                  d="M-111 10C-106 26-100 40-94 49C-74 56-48 58-22 57C0 56 22 56 44 57C68 58 84 55 94 49C100 40 106 26 111 10"
+                  fill="none"
+                  stroke={emberReference.tape}
+                  strokeWidth={emberReference.tapeStroke}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity=".86"
+                />
+                <path
+                  d="M-110 11C-105 27-100 39-94 48C-74 55-48 57-22 56C0 55 22 55 44 56C68 57 83 54 93 48C99 39 105 27 110 11"
+                  fill="none"
+                  stroke="#F7B47B"
+                  strokeWidth=".65"
+                  strokeLinecap="round"
+                  opacity=".28"
+                />
+              </g>
+
+              <g data-cassette-depth-layer="lower-mechanical-panel" pointerEvents="none">
+                <rect x="-90" y="40" width="180" height="25" rx="4" fill="#FFF8EE" fillOpacity=".16" stroke={emberReference.shellStroke} strokeWidth="1.1" strokeOpacity=".52" />
+                <path d="M-85 44H85M-85 48H85M-85 52H85M-85 56H85M-85 60H85" fill="none" stroke="#FFF8EE" strokeWidth="1" opacity=".23" />
+              </g>
+
+              <g data-cassette-depth-layer="translucent-shell" pointerEvents="none">
+                <rect x="-126" y="-66" width="252" height="132" rx="6" fill={emberReference.shellFill} opacity={emberReference.shellOpacity} />
+                <rect
+                  data-cassette-surface="inner-field"
+                  x="-124"
+                  y="-64"
+                  width="248"
+                  height="128"
+                  rx="5"
+                  fill={emberReference.innerFieldFill}
+                  opacity={emberReference.innerFieldOpacity}
+                />
+                <rect
+                  data-cassette-surface="shell-grain"
+                  x="-124"
+                  y="-64"
+                  width="248"
+                  height="128"
+                  rx="5"
+                  fill="url(#industrial-plastic-grain)"
+                  opacity=".055"
+                />
+              </g>
+
+              <g data-cassette-depth-layer="molded-seams" pointerEvents="none">
+                <rect x="-119" y="-59" width="238" height="118" rx="5" fill="none" stroke={emberReference.innerSeam} strokeWidth={emberReference.seamStroke} opacity=".48" />
+                <path d="M-111-51H-53M53-51H111M-111 31H-53M53 31H111" fill="none" stroke={emberReference.shellStroke} strokeWidth="1.15" strokeLinecap="round" opacity=".42" />
+              </g>
+
+              <g data-cassette-depth-layer="signal-registration" pointerEvents="none">
+                {emberReference.signalSegments.map((segment) => (
+                  <g key={segment.x}>
+                    <rect
+                      data-cassette-element="signal-segment"
+                      x={segment.x}
+                      y={emberReference.signalY}
+                      width={segment.width}
+                      height={emberReference.signalHeight}
+                      rx={emberReference.signalHeight / 2}
+                      fill={emberReference.signal}
+                      opacity=".82"
+                    />
+                    <path
+                      d={`M${segment.x + 2} ${emberReference.signalY + 1}H${segment.x + segment.width - 2}`}
+                      fill="none"
+                      stroke={emberReference.signalHighlight}
+                      strokeWidth=".55"
+                      strokeLinecap="round"
+                      opacity=".34"
+                    />
+                  </g>
+                ))}
+              </g>
+
+              <g data-cassette-depth-layer="surface-completion" pointerEvents="none">
+                <rect
+                  data-cassette-element="index-plate"
+                  x={emberReference.surfaceCompletion.indexPlate.x}
+                  y={emberReference.surfaceCompletion.indexPlate.y}
+                  width={emberReference.surfaceCompletion.indexPlate.width}
+                  height={emberReference.surfaceCompletion.indexPlate.height}
+                  rx={emberReference.surfaceCompletion.indexPlate.rx}
+                  fill={emberReference.innerFieldFill}
+                  fillOpacity=".22"
+                  stroke={emberReference.shellStroke}
+                  strokeWidth="1.1"
+                  strokeOpacity=".58"
+                />
+                <g data-cassette-element="index-grooves" fill="none" stroke={emberReference.shellStroke} strokeWidth=".8" strokeLinecap="round" opacity=".55">
+                  {emberReference.surfaceCompletion.indexGrooves.map((groove) => (
+                    <path key={groove.y} d={`M${groove.x} ${groove.y}H${groove.x + groove.width}`} />
+                  ))}
+                </g>
+                <g data-cassette-element="index-ticks" fill={emberReference.signalHighlight} opacity=".7">
+                  {emberReference.surfaceCompletion.indexTicks.map((tick) => (
+                    <rect key={`${tick.x}-${tick.y}`} x={tick.x} y={tick.y} width={tick.width} height={tick.height} rx=".75" />
+                  ))}
+                </g>
+                <image
+                  data-cassette-element="edition-badge"
+                  data-cassette-sticker="edition-01-badge"
+                  href={emberReference.surfaceCompletion.badge.href}
+                  x={emberReference.surfaceCompletion.badge.x}
+                  y={emberReference.surfaceCompletion.badge.y}
+                  width={emberReference.surfaceCompletion.badge.width}
+                  height={emberReference.surfaceCompletion.badge.height}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              </g>
+
+              <g data-cassette-depth-layer="surface-stickers" pointerEvents="none">
+                <image
+                  data-cassette-sticker="northern-star"
+                  href={EMBER_STICKER_LAYOUT.northernStar.href}
+                  x={EMBER_STICKER_LAYOUT.northernStar.x}
+                  y={EMBER_STICKER_LAYOUT.northernStar.y}
+                  width={EMBER_STICKER_LAYOUT.northernStar.width}
+                  height={EMBER_STICKER_LAYOUT.northernStar.height}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <image
+                  data-cassette-sticker="chill-lofi"
+                  href={EMBER_STICKER_LAYOUT.chillLofi.href}
+                  x={EMBER_STICKER_LAYOUT.chillLofi.x}
+                  y={EMBER_STICKER_LAYOUT.chillLofi.y}
+                  width={EMBER_STICKER_LAYOUT.chillLofi.width}
+                  height={EMBER_STICKER_LAYOUT.chillLofi.height}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              </g>
+
+              <g data-cassette-depth-layer="guide-knobs" pointerEvents="none">
+                {[-1, 1].map((side) => (
+                  <g key={side} transform={`translate(${side < 0 ? emberReference.guideLeftX : emberReference.guideRightX} ${emberReference.guideY})`}>
+                    <circle r={emberReference.guideOuterRadius} fill="none" stroke={emberReference.mediaEdge} strokeWidth="2" opacity=".72" />
+                    <circle r={emberReference.guideInnerRadius} fill={emberReference.hub} opacity=".95" />
+                    <circle r="5" fill="none" stroke={emberReference.hubHighlight} strokeWidth="1.1" opacity=".78" />
+                    <circle r="2" fill={emberReference.mediaEdge} opacity=".76" />
+                  </g>
+                ))}
+              </g>
+            </g>
+          )}
+
           {tape.variant === 'signal' && (
-            <g fill={accent} opacity=".78">
-              <rect x="-76" y="-34" width="14" height="3" rx="1" />
-              <rect x="62" y="-34" width="14" height="3" rx="1" />
-              <path d="M-68 34H-42M42 34H68" fill="none" stroke={accent} strokeWidth="2" />
+            <g className="graphic-tape-material graphic-tape-material--signal" data-cassette-material="signal">
+              <g data-cassette-depth-layer="signal-field" pointerEvents="none">
+                <rect x="-126" y="-66" width="252" height="132" rx="6" fill="url(#night-soul-shell-gradient)" opacity=".96" />
+                <rect x="-119" y="-59" width="238" height="90" rx="4" fill="url(#night-soul-field-gradient)" />
+                <rect x="-119" y="-59" width="238" height="90" rx="4" fill="url(#night-soul-field-soft-focus)" opacity=".92" filter="url(#night-soul-soft-focus-blur)" />
+                <image
+                  data-cassette-texture="soft-focus"
+                  href={signalReference.textures.softFocusTexture}
+                  x="-119"
+                  y="-59"
+                  width="238"
+                  height="90"
+                  opacity=".30"
+                  preserveAspectRatio="xMidYMid slice"
+                  style={{ mixBlendMode: 'soft-light' }}
+                />
+                <rect x="-119" y="20" width="238" height="39" fill="url(#night-soul-lower-fade)" opacity=".94" />
+              </g>
+
+              <g data-cassette-depth-layer="signal-soft-focus-atmosphere" pointerEvents="none" opacity=".46">
+                <ellipse cx="-78" cy="-1" rx="36" ry="25" fill="url(#night-soul-atmosphere)" filter="url(#night-soul-soft-focus-blur)" />
+                <ellipse cx="78" cy="-1" rx="36" ry="25" fill="url(#night-soul-atmosphere)" filter="url(#night-soul-soft-focus-blur)" />
+                <ellipse cx="0" cy="46" rx="78" ry="15" fill="url(#night-soul-atmosphere)" filter="url(#night-soul-soft-focus-blur)" opacity=".72" />
+              </g>
+
+              <g data-cassette-depth-layer="signal-mist" pointerEvents="none" opacity=".5">
+                <ellipse cx="104" cy="-46" rx="40" ry="10" fill="url(#night-soul-mist-gradient)" filter="url(#night-soul-mist-blur)" />
+                <ellipse cx="-106" cy="-48" rx="32" ry="9" fill="url(#night-soul-mist-gradient)" filter="url(#night-soul-mist-blur)" opacity=".65" />
+                <path d="M68-22C82-31 104-30 120-18C104-14 88-13 71-16Z" fill="#C7D8FF" opacity=".12" filter="url(#night-soul-mist-blur)" />
+                <image
+                  data-cassette-texture="mist-left"
+                  href={signalReference.textures.mistLeft}
+                  x="-88"
+                  y="-69"
+                  width="47"
+                  height="42"
+                  opacity=".22"
+                  preserveAspectRatio="xMidYMid slice"
+                />
+                <image
+                  data-cassette-texture="mist-right"
+                  href={signalReference.textures.mistRight}
+                  x="64"
+                  y="-68"
+                  width="58"
+                  height="46"
+                  opacity=".19"
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              </g>
+
+              <g data-cassette-depth-layer="signal-print-field" pointerEvents="none" mask="url(#night-soul-print-distress-soft-mask)">
+                <path d="M-119 -38.5H-58M58 -38.5H119" fill="none" stroke="#7890C7" strokeWidth="1" opacity=".58" />
+                <image
+                  data-cassette-decal="edition-02"
+                  href={signalReference.decals.edition02.href}
+                  x={signalReference.decals.edition02.x}
+                  y={signalReference.decals.edition02.y}
+                  width={signalReference.decals.edition02.width}
+                  height={signalReference.decals.edition02.height}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <SignalCounterCapsule centerX={-79} y={-41} />
+                <image
+                  data-cassette-decal="side-b"
+                  href={signalReference.decals.sideB.href}
+                  x={signalReference.decals.sideB.x}
+                  y={signalReference.decals.sideB.y}
+                  width={signalReference.decals.sideB.width}
+                  height={signalReference.decals.sideB.height}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <image
+                  data-cassette-decal="stereo"
+                  href={signalReference.decals.stereo.href}
+                  x={signalReference.decals.stereo.x}
+                  y={signalReference.decals.stereo.y}
+                  width={signalReference.decals.stereo.width}
+                  height={signalReference.decals.stereo.height}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <SignalCounterCapsule centerX={79} y={-41} mirrored />
+              </g>
+
+              <g data-cassette-depth-layer="signal-core-window" pointerEvents="none">
+                <rect x="-51" y="-20" width="102" height="40" rx="4" fill="url(#night-soul-core-gradient)" stroke="#133C9C" strokeWidth="1.1" mask="url(#night-soul-core-window-cutouts)" />
+                <rect x="-51" y="-20" width="102" height="40" rx="4" fill="url(#night-soul-core-soft-focus)" opacity=".86" filter="url(#night-soul-soft-focus-blur)" mask="url(#night-soul-core-window-cutouts)" />
+                <image
+                  data-cassette-texture="soft-focus-core"
+                  href={signalReference.textures.softFocusTexture}
+                  x="-51"
+                  y="-20"
+                  width="102"
+                  height="40"
+                  opacity=".24"
+                  preserveAspectRatio="xMidYMid slice"
+                  style={{ mixBlendMode: 'soft-light' }}
+                  mask="url(#night-soul-core-window-cutouts)"
+                />
+                <rect x="-25" y="-17" width="50" height="34" rx="3" fill="#2A68EF" opacity=".32" mask="url(#night-soul-core-window-cutouts)" />
+              </g>
+
+              <g data-cassette-depth-layer="lower-mechanism" pointerEvents="none">
+                <path d="M-108 31H108L96 65H-96Z" fill="#2E5EC4" opacity=".34" stroke="#0B2D7F" strokeWidth="1.4" />
+                <path d="M-124 61H124" fill="none" stroke="#79A8FF" strokeWidth="1" opacity=".32" />
+                <path d="M0 50V59" fill="none" stroke="#133B9E" strokeWidth="2.2" opacity=".84" />
+                <rect x="-18" y="59" width="36" height="7" rx="2" fill="#123889" stroke="#061B53" strokeWidth="1.4" opacity=".84" />
+                <circle cx="0" cy="50" r="7" fill="#0A2B7B" stroke="#5A83E4" strokeWidth="1.2" />
+                <circle cx="0" cy="50" r="3" fill="#020B20" />
+              </g>
+
+              <g data-cassette-depth-layer="reference-wear-textures" pointerEvents="none">
+                <image
+                  data-cassette-texture="edge-wear"
+                  href={signalReference.textures.edgeWear}
+                  x="-140"
+                  y="-80"
+                  width="280"
+                  height="156"
+                  opacity=".7"
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <image
+                  data-cassette-texture="lower-mechanism-wear"
+                  href={signalReference.textures.lowerMechanismWear}
+                  x="-134"
+                  y="35"
+                  width="268"
+                  height="36"
+                  opacity=".42"
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              </g>
+
+              <g data-cassette-depth-layer="guide-knobs" pointerEvents="none">
+                {[-1, 1].map((side) => (
+                  <g key={side} transform={`translate(${side * 94} 49)`}>
+                    <circle r="13" fill="#0A2B74" opacity=".74" stroke="#06205E" strokeWidth="1.4" />
+                    <circle r="8" fill="#D8E4FF" opacity=".9" />
+                    <circle r="8" fill="none" stroke="#132B65" strokeWidth="1" opacity=".8" />
+                    <circle cy="2" r="4" fill="#7D9DE6" opacity=".8" />
+                    <path d="M-5-9L5-9" stroke="#F4F5F1" strokeWidth="1" opacity=".64" />
+                  </g>
+                ))}
+              </g>
+
+              <g data-cassette-depth-layer="surface-stickers" pointerEvents="none">
+                <ellipse
+                  data-cassette-texture="logo-soft-focus"
+                  cx="0"
+                  cy="-48"
+                  rx="54"
+                  ry="17"
+                  fill="url(#night-soul-logo-atmosphere)"
+                  opacity=".48"
+                  filter="url(#night-soul-soft-focus-blur)"
+                />
+                <g>
+                  <image
+                    data-cassette-decal="night-title"
+                    href={signalReference.decals.nightTitle.href}
+                    x={signalReference.decals.nightTitle.x}
+                    y={signalReference.decals.nightTitle.y}
+                    width={signalReference.decals.nightTitle.width}
+                    height={signalReference.decals.nightTitle.height}
+                    opacity=".96"
+                    preserveAspectRatio="xMidYMid meet"
+                  />
+                </g>
+                <g>
+                  <g
+                    transform={`rotate(${signalReference.decals.soulSticker.rotation} ${signalReference.decals.soulSticker.x + signalReference.decals.soulSticker.width / 2} ${signalReference.decals.soulSticker.y + signalReference.decals.soulSticker.height / 2})`}
+                  >
+                    <rect
+                      data-cassette-element="soul-label"
+                      x={signalReference.decals.soulSticker.x}
+                      y={signalReference.decals.soulSticker.y}
+                      width={signalReference.decals.soulSticker.width}
+                      height={signalReference.decals.soulSticker.height}
+                      rx="1.5"
+                      fill="#020713"
+                      stroke="#28478E"
+                      strokeWidth=".7"
+                      opacity=".96"
+                    />
+                    <path
+                      d={`M${signalReference.decals.soulSticker.x + 2} ${signalReference.decals.soulSticker.y + 2}H${signalReference.decals.soulSticker.x + signalReference.decals.soulSticker.width - 2}M${signalReference.decals.soulSticker.x + 2} ${signalReference.decals.soulSticker.y + signalReference.decals.soulSticker.height - 2}H${signalReference.decals.soulSticker.x + signalReference.decals.soulSticker.width - 2}`}
+                      fill="none"
+                      stroke="#6A86D6"
+                      strokeWidth=".65"
+                      opacity=".38"
+                    />
+                    <image
+                      data-cassette-decal="soul-script"
+                      href={signalReference.decals.soulScript.href}
+                      x={signalReference.decals.soulSticker.x + 6}
+                      y={signalReference.decals.soulSticker.y - 1}
+                      width={signalReference.decals.soulSticker.width - 12}
+                      height={signalReference.decals.soulSticker.height + 2}
+                      preserveAspectRatio="xMidYMid meet"
+                    />
+                  </g>
+                </g>
+              </g>
             </g>
           )}
+
           {tape.variant === 'paper' && (
-            <g fill={accent} opacity=".68">
-              {[-72, -54, 54, 72].map((x) => <circle key={x} cx={x} cy="-34" r="2" />)}
-              <path d="M-70 34H-52M52 34H70" stroke={accent} strokeWidth="2" />
+            <g className="graphic-tape-material graphic-tape-material--paper" data-cassette-material="paper">
+              {[-108, -96, -84, 84, 96, 108].map((x) => (
+                <g key={x}>
+                  <rect x={x - 4} y="-54" width="8" height="108" rx="4" fill="#B7B1A5" opacity=".34" />
+                  <path d={`M${x - 2} -49V49`} stroke="#F4F0E7" strokeWidth="3" opacity=".48" />
+                </g>
+              ))}
+              <path d="M-76-51H76M-76 51H76" fill="none" stroke={accent} strokeWidth={CASSETTE_VISUAL_TOKENS.primaryFeatureStroke} opacity=".54" />
             </g>
           )}
-          <g fill={COLORS.ink} opacity=".72">
-            <rect x="-108" y="-64" width="8" height="5" />
-            <rect x="-94" y="-64" width="5" height="5" />
-            <rect x="89" y="-64" width="5" height="5" />
-            <rect x="100" y="-64" width="8" height="5" />
-          </g>
-          <path d="M-134-24H-124M124-24H134" stroke={COLORS.paper} strokeWidth="2" opacity=".7" />
-          <g fill="#C7C4BB">
+
+          {!isEmber && tape.variant !== 'signal' && <g className="graphic-tape-identity" pointerEvents="none">
+            <rect
+              x={identityPlate.x}
+              y={identityPlate.y}
+              width={identityPlate.width}
+              height={identityPlate.height}
+              rx="5"
+              fill={edition.identityFill}
+              stroke={edition.identityStroke}
+              strokeWidth={CASSETTE_VISUAL_TOKENS.primaryFeatureStroke}
+            />
+            <text
+              x="-109"
+              y="-41"
+              fill={edition.editionText}
+              fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+              fontSize={CASSETTE_VISUAL_TOKENS.editionFontSize}
+              fontWeight="700"
+              letterSpacing="1"
+            >
+              {edition.number}
+            </text>
+            <g
+              className="graphic-tape-title"
+              fill={edition.identityText}
+              textAnchor="middle"
+              fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+              fontSize={CASSETTE_VISUAL_TOKENS.titleFontSize}
+              fontWeight="700"
+              letterSpacing=".7"
+            >
+              <text x="0" y="-7">{titleLines[0]}</text>
+              <text x="0" y="10">{titleLines[1]}</text>
+            </g>
+          </g>}
+          {isEmber ? (
+            <g data-cassette-depth-layer="molded-hardware" fill="none" stroke={emberReference.shellStroke} opacity=".5" pointerEvents="none">
+              <rect x="-111" y="-65" width="18" height="7" rx="1.5" strokeWidth="1.2" />
+              <rect x="93" y="-65" width="18" height="7" rx="1.5" strokeWidth="1.2" />
+              <path d="M-134-24H-124M124-24H134" strokeWidth="1.7" strokeLinecap="round" />
+            </g>
+          ) : tape.variant === 'signal' ? null : (
+            <>
+              <g fill={COLORS.ink} opacity=".72">
+                <rect x="-108" y="-64" width="8" height="5" />
+                <rect x="-94" y="-64" width="5" height="5" />
+                <rect x="89" y="-64" width="5" height="5" />
+                <rect x="100" y="-64" width="8" height="5" />
+              </g>
+              <path d="M-134-24H-124M124-24H134" stroke={COLORS.paper} strokeWidth="2" opacity=".7" />
+            </>
+          )}
+          <g display={tape.variant === 'signal' ? 'none' : undefined} fill={isEmber ? 'none' : '#C7C4BB'} stroke={isEmber ? emberReference.shellStroke : 'none'} opacity={isEmber ? .55 : 1}>
             {[-1, 1].flatMap((sx) => [-1, 1].map((sy) => (
-              <circle key={`${sx}-${sy}`} cx={sx * 122} cy={sy * 66} r="4" />
+              <g key={`${sx}-${sy}`}>
+                <circle cx={sx * 122} cy={sy * 66} r="4" strokeWidth={isEmber ? 1.2 : undefined} />
+                {isEmber && <circle cx={sx * 122} cy={sy * 66} r="1.1" fill={emberReference.mediaEdge} stroke="none" />}
+              </g>
             )))}
           </g>
-          <rect x="-62" y="54" width="124" height="9" rx="2" fill={tape.tint} stroke={COLORS.inkDeep} strokeWidth="2" opacity=".92" />
-          <rect x="-24" y="58" width="48" height="3" rx="1" fill={accent} opacity=".82" />
-        </g>
-        <g fill="none" stroke={COLORS.inkDeep} strokeWidth="3">
-          {[-1, 1].map((side) => (
-            <g key={side} transform={`translate(${side * reelX} 0)`}>
-              <circle r="23" stroke={COLORS.inkDeep} />
-              <circle r="19" stroke={COLORS.paper} opacity=".9" />
-              <g transform={`rotate(${reelTurn * side})`} stroke={accent} strokeWidth="4" strokeLinecap="round">
-                <path d="M14-4A15 15 0 0 1 10 10" />
-                <path d="M-14 4A15 15 0 0 1-10-10" />
+          {!isEmber && tape.variant !== 'signal' && (
+            <>
+              <rect x="-62" y="54" width="124" height="9" rx="2" fill={tape.tint} stroke={COLORS.inkDeep} strokeWidth="2" opacity=".92" />
+              <rect x="-24" y="58" width="48" height="3" rx="1" fill={accent} opacity=".82" />
+            </>
+          )}
           </g>
         </g>
+        <g
+          data-cassette-depth-layer="reel-hardware"
+          data-cassette-functional-layer={tape.variant === 'signal' ? 'functional-reel-hardware' : undefined}
+          data-cassette-element={tape.variant === 'signal' ? 'reel-gear' : undefined}
+          data-reel-pivot={tape.variant === 'signal' ? 'receiver-centre' : undefined}
+          data-reel-state={playing ? 'playing' : tape.reelTurn ? 'moving' : 'idle'}
+          fill="none"
+          stroke={isEmber ? emberReference.mediaEdge : COLORS.inkDeep}
+          strokeWidth={isEmber ? 2 : 3}
+          pointerEvents="none"
+        >
+          <g display={isCathedralDust ? 'none' : undefined}>
+          {[-1, 1].map((side) => (
+            <g key={side} data-reel-side={side < 0 ? 'left' : 'right'} transform={'translate(' + (side * reelX) + ' 0)'}>
+              <circle r={isEmber ? emberReference.reelOuterRadius : 23} stroke={isEmber ? emberReference.mediaEdge : COLORS.inkDeep} />
+              <circle r={isEmber ? emberReference.reelInnerRadius : 19} stroke={isEmber ? emberReference.hub : COLORS.paper} strokeWidth={isEmber ? 2.5 : undefined} opacity=".9" />
+              {tape.variant === 'signal' ? (
+                <g
+                  data-reel-motion="signal"
+                  className={playing && !reducedMotion ? 'graphic-tape-reel-gear is-playing' : 'graphic-tape-reel-gear'}
+                  style={playing && !reducedMotion ? { transformBox: 'fill-box', transformOrigin: 'center' } : undefined}
+                  transform={'rotate(' + (reelTurn * side) + ')'}
+                  strokeLinecap="round"
+                >
+                  <path d="M-15-5A16 16 0 0 1-5-15L-2-11A11 11 0 0 0-11-2Z" stroke="#071331" strokeWidth="4.5" />
+                  <path d="M15 5A16 16 0 0 1 5 15L2 11A11 11 0 0 0 11 2Z" stroke="#071331" strokeWidth="4.5" />
+                  <circle r="4" fill="none" stroke="#E6E8E4" strokeWidth="1.6" opacity=".82" />
+                </g>
+              ) : (
+                <g transform={'rotate(' + (reelTurn * side) + ')'} stroke={reelAccent} strokeWidth={isEmber ? 3 : 4} strokeLinecap="round">
+                  <path d="M14-4A15 15 0 0 1 10 10" />
+                  <path d="M-14 4A15 15 0 0 1-10-10" />
+                </g>
+              )}
+            </g>
           ))}
+          </g>
         </g>
+        {isSignal && (
+          <g data-cassette-depth-layer="surface-stickers-top" pointerEvents="none">
+            <g data-cassette-depth-layer="sticker-shadows" opacity=".08" filter="url(#night-soul-tape-shadow)">
+              <image
+                href={signalReference.decals.lordStrip.href}
+                x={signalReference.decals.lordStrip.x}
+                y={signalReference.decals.lordStrip.y + 2}
+                width={signalReference.decals.lordStrip.width}
+                height={signalReference.decals.lordStrip.height}
+                preserveAspectRatio="xMidYMid meet"
+              />
+              <image
+                href={signalReference.decals.waitOnYouStrip.href}
+                x={signalReference.decals.waitOnYouStrip.x}
+                y={signalReference.decals.waitOnYouStrip.y + 2}
+                width={signalReference.decals.waitOnYouStrip.width}
+                height={signalReference.decals.waitOnYouStrip.height}
+                preserveAspectRatio="xMidYMid meet"
+              />
+            </g>
+            <g opacity=".84">
+              <image
+                data-cassette-decal="lord-strip"
+                href={signalReference.decals.lordStrip.href}
+                x={signalReference.decals.lordStrip.x}
+                y={signalReference.decals.lordStrip.y}
+                width={signalReference.decals.lordStrip.width}
+                height={signalReference.decals.lordStrip.height}
+                preserveAspectRatio="xMidYMid meet"
+              />
+              <image
+                data-cassette-decal="wait-on-you-strip"
+                href={signalReference.decals.waitOnYouStrip.href}
+                x={signalReference.decals.waitOnYouStrip.x}
+                y={signalReference.decals.waitOnYouStrip.y}
+                width={signalReference.decals.waitOnYouStrip.width}
+                height={signalReference.decals.waitOnYouStrip.height}
+                preserveAspectRatio="xMidYMid meet"
+              />
+            </g>
+          </g>
+        )}
+        {isSignal && (
+          <rect
+            data-cassette-depth-layer="global-grain"
+            data-cassette-texture="global-grain"
+            x="-140"
+            y="-80"
+            width="280"
+            height="156"
+            rx="11"
+            fill="url(#night-soul-global-grain)"
+            opacity=".05"
+            mask="url(#cassette-reel-cutouts)"
+            style={{ mixBlendMode: 'soft-light' }}
+            pointerEvents="none"
+          />
+        )}
         {holding && (
           <>
             <defs>
@@ -671,7 +1613,7 @@ function DeckGraphic({
     [640 + backHalf, anchorY - depth],
     [640 - backHalf, anchorY - depth],
   ];
-  const top = pointList(topPoints);
+  const topPath = roundedQuadPath(topPoints, TOP_SURFACE_RADIUS);
   const frontBottomY = anchorY + 478 * sin * scale;
   // 正面从窄底边长成真正的矩形，而不是两张等宽卡片交叉替换。
   const frontBottomHalf = outerHalf;
@@ -686,7 +1628,7 @@ function DeckGraphic({
     [640 + panelBackHalf, panelBackY],
     [640 - panelBackHalf, panelBackY],
   ];
-  const panel = pointList(panelPoints);
+  const panelPath = roundedQuadPath(panelPoints, TOP_PANEL_RADIUS);
   // The reading bay is centered on the receiver axis, not above it.
   // This makes the seated cassette fit the cavity without a hidden scale or
   // an unexplained lower protrusion.
@@ -724,25 +1666,36 @@ function DeckGraphic({
           <ellipse cx="349" cy="762" rx="24" ry="4" fill="#D9D7CF" />
           <ellipse cx="931" cy="762" rx="24" ry="4" fill="#D9D7CF" />
         </g>
-        <g className="front-stand--reference" display={frontMode === 'reference' ? undefined : 'none'} filter="url(#stand-shadow)" pointerEvents="none">
-          <rect x="294" y="678" width="692" height="12" rx="4" fill="#25282A" stroke="#111315" strokeWidth="2" />
-          <rect x="320" y="710" width="640" height="24" rx="5" fill="#25282A" stroke="#111315" strokeWidth="3" />
-          <path d="M320 721H960" stroke="#464A4B" strokeWidth="7" strokeLinecap="round" />
-          <path d="M320 721H960" stroke="#111315" strokeWidth="2.5" strokeLinecap="round" opacity=".9" />
-          <path d="M306 680H370L344 768H290Z" fill="#303336" stroke="#111315" strokeWidth="3" />
-          <path d="M910 680H974L990 768H936Z" fill="#303336" stroke="#111315" strokeWidth="3" />
-          <path d="M298 714H344M936 714H982" stroke="#111315" strokeWidth="5" strokeLinecap="round" />
-          <rect x="286" y="766" width="60" height="7" rx="3" fill="#111315" />
-          <rect x="934" y="766" width="60" height="7" rx="3" fill="#111315" />
+        <g className="front-stand--reference" display={frontMode === 'reference' ? undefined : 'none'} filter="url(#reference-stand-shadow)" pointerEvents="none">
+          {/* One recessed plinth owns the chassis connection. Most of it sits
+              behind the authoritative front shell; only the lower lip remains
+              visible, so the support reads as mounted instead of pasted on. */}
+          <rect x="286" y="670" width="708" height="25" rx="5" fill="url(#reference-stand-plinth)" stroke="#202223" strokeWidth="2" />
+          <path d="M298 688H982" stroke="#5B5E5D" strokeWidth="1.5" strokeLinecap="round" opacity=".62" />
+
+          {/* A single structural rail replaces the former doubled bars. It is
+              drawn behind the legs and uses thickness, not stacked strokes,
+              to explain its load-bearing role. */}
+          <rect x="334" y="722" width="612" height="15" rx="6" fill="#2C2F30" stroke="#191B1C" strokeWidth="2" />
+          <path d="M344 726H936" stroke="#555958" strokeWidth="1.4" strokeLinecap="round" opacity=".62" />
+
+          {/* Macintosh-inspired connection logic, adapted to the existing
+              frontal silhouette: outer edges stay vertical while the inner
+              edges taper toward compact contact feet. */}
+          <path d="M294 682H372L344 765H294Z" fill="url(#reference-stand-leg)" stroke="#191B1C" strokeWidth="2.5" />
+          <path d="M908 682H986V765H936Z" fill="url(#reference-stand-leg)" stroke="#191B1C" strokeWidth="2.5" />
+          <path d="M304 694H360M920 694H976" stroke="#5A5D5C" strokeWidth="1.5" strokeLinecap="round" opacity=".5" />
+          <rect x="290" y="762" width="58" height="9" rx="4" fill="#17191A" />
+          <rect x="932" y="762" width="58" height="9" rx="4" fill="#17191A" />
         </g>
       </g>
       <polygon points={front} fill={COLORS.bodyHi} stroke="#B7B6B0" strokeWidth="4" />
 
       <g opacity={topOpacity}>
-        <polygon points={top} fill={COLORS.inkDeep} opacity=".25" transform="translate(0 12)" />
-        <polygon points={top} fill={COLORS.bodyHi} stroke={COLORS.inkDeep} strokeWidth="5" />
-        <polygon points={panel} fill={COLORS.body} stroke="#666A68" strokeWidth="2.4" />
-        <TopSurfaceDetails panel={panelPoints} top={topPoints} />
+        <path d={topPath} fill={COLORS.inkDeep} opacity=".25" transform="translate(0 12)" />
+        <path d={topPath} fill={COLORS.bodyHi} stroke={COLORS.inkDeep} strokeWidth="5" />
+        <path d={panelPath} fill={COLORS.body} stroke="#666A68" strokeWidth="2.4" />
+        <TopSurfaceDetails panel={panelPoints} top={topPoints} panelPath={panelPath} />
 
         <polygon points={slot} fill={COLORS.inkDeep} stroke="#4B4D4A" strokeWidth="5" />
         <polygon points={slot} fill="none" stroke={bayOpen > .3 ? COLORS.orange : '#70716D'} strokeWidth="2" opacity=".88" transform="translate(0 -3)" />
@@ -1203,6 +2156,7 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
   const animateInsert = useCallback((id, { immediate = false } = {}) => {
     stopAnimation();
     const track = getTrackByCassetteId(id);
+    const tapeVariation = createRandomTapeVariation();
     setPendingTrackId(track.id);
     setActiveTrackId(null);
     setIsPlaying(false);
@@ -1214,9 +2168,6 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
     clearCuePoints();
     setPlayedUntil(0);
     setPlaybackRate(1);
-    setToneCutoff(400);
-    setSpaceAmount(0);
-    setTextureAmount(0);
     setShuttleDirection(0);
     const start = performance.now();
     let trackCommitted = false;
@@ -1284,6 +2235,9 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
         : 1 - easeOut((raw - INSERT_TIMING.lockEnd) / .08);
       if (!trackCommitted && raw >= INSERT_TIMING.lockEnd) {
         trackCommitted = true;
+        setToneCutoff(tapeVariation.toneCutoff);
+        setSpaceAmount(tapeVariation.space);
+        setTextureAmount(tapeVariation.texture);
         setActiveTrackId(track.id);
         setPendingTrackId(null);
       }
@@ -1990,13 +2944,122 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
           <filter id="tape-shadow" x="-20%" y="-20%" width="140%" height="160%">
             <feDropShadow dx="0" dy="12" stdDeviation="9" floodColor="#251416" floodOpacity=".34" />
           </filter>
+          <filter id="cathedral-engraving-emboss" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation=".55" result="engraving-blur" />
+            <feOffset in="engraving-blur" dx=".65" dy=".75" result="engraving-shadow-offset" />
+            <feFlood floodColor="#827968" floodOpacity=".55" result="engraving-shadow-color" />
+            <feComposite in="engraving-shadow-color" in2="engraving-shadow-offset" operator="in" result="engraving-shadow" />
+            <feOffset in="engraving-blur" dx="-.45" dy="-.55" result="engraving-highlight-offset" />
+            <feFlood floodColor="#F4F0E6" floodOpacity=".52" result="engraving-highlight-color" />
+            <feComposite in="engraving-highlight-color" in2="engraving-highlight-offset" operator="in" result="engraving-highlight" />
+            <feColorMatrix
+              in="SourceGraphic"
+              type="matrix"
+              values="0 0 0 0 .48 0 0 0 0 .45 0 0 0 0 .39 0 0 0 .52 0"
+              result="engraving-face"
+            />
+            <feMerge>
+              <feMergeNode in="engraving-shadow" />
+              <feMergeNode in="engraving-highlight" />
+              <feMergeNode in="engraving-face" />
+            </feMerge>
+          </filter>
           <filter id="stand-shadow" x="-20%" y="-20%" width="140%" height="160%">
             <feDropShadow dx="0" dy="10" stdDeviation="8" floodColor="#2A1711" floodOpacity=".28" />
           </filter>
+          <filter id="reference-stand-shadow" x="-20%" y="-20%" width="140%" height="150%">
+            <feDropShadow dx="0" dy="7" stdDeviation="6" floodColor="#17191A" floodOpacity=".17" />
+          </filter>
+          <filter id="night-soul-mist-blur" x="-30%" y="-100%" width="160%" height="300%">
+            <feGaussianBlur stdDeviation="4.5" />
+          </filter>
+          <filter id="night-soul-tape-shadow" x="-20%" y="-20%" width="140%" height="160%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+          <filter id="night-soul-soft-focus-blur" x="-20%" y="-30%" width="140%" height="160%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+          <linearGradient id="night-soul-shell-gradient" gradientUnits="userSpaceOnUse" x1="-116" y1="-70" x2="112" y2="68">
+            <stop offset="0" stopColor="#3862C2" />
+            <stop offset=".42" stopColor="#23499D" />
+            <stop offset="1" stopColor="#092568" />
+          </linearGradient>
+          <linearGradient id="night-soul-field-gradient" gradientUnits="userSpaceOnUse" x1="-104" y1="-62" x2="104" y2="38">
+            <stop offset="0" stopColor="#0A285E" />
+            <stop offset=".18" stopColor="#061B43" />
+            <stop offset=".46" stopColor="#020A1C" />
+            <stop offset=".66" stopColor="#061430" />
+            <stop offset=".84" stopColor="#103B84" />
+            <stop offset="1" stopColor="#2455AE" />
+          </linearGradient>
+          <radialGradient id="night-soul-field-soft-focus" gradientUnits="userSpaceOnUse" cx="0" cy="-10" r="150">
+            <stop offset="0" stopColor="#020A1B" stopOpacity=".22" />
+            <stop offset=".42" stopColor="#1A3B84" stopOpacity=".12" />
+            <stop offset=".78" stopColor="#80A7F0" stopOpacity=".22" />
+            <stop offset="1" stopColor="#B8CCF8" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="night-soul-lower-fade" gradientUnits="userSpaceOnUse" x1="0" y1="18" x2="0" y2="65">
+            <stop offset="0" stopColor="#0D2D78" stopOpacity=".02" />
+            <stop offset=".45" stopColor="#2453B5" stopOpacity=".52" />
+            <stop offset="1" stopColor="#4E83EB" stopOpacity=".86" />
+          </linearGradient>
+          <linearGradient id="night-soul-core-gradient" gradientUnits="userSpaceOnUse" x1="-40" y1="-20" x2="40" y2="20">
+            <stop offset="0" stopColor="#0C2F89" />
+            <stop offset=".22" stopColor="#1C5FDB" />
+            <stop offset=".48" stopColor="#09245F" />
+            <stop offset=".66" stopColor="#10328A" />
+            <stop offset=".84" stopColor="#2D68E8" />
+            <stop offset="1" stopColor="#1647B4" />
+          </linearGradient>
+          <radialGradient id="night-soul-core-soft-focus" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="70">
+            <stop offset="0" stopColor="#061947" stopOpacity=".66" />
+            <stop offset=".36" stopColor="#0D2E88" stopOpacity=".42" />
+            <stop offset=".7" stopColor="#7BA1F6" stopOpacity=".16" />
+            <stop offset="1" stopColor="#AFC5FA" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="night-soul-mist-gradient" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="40">
+            <stop offset="0" stopColor="#D8E5FF" stopOpacity=".5" />
+            <stop offset="1" stopColor="#9DB7F5" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="night-soul-atmosphere" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="58">
+            <stop offset="0" stopColor="#A7C0FF" stopOpacity=".24" />
+            <stop offset=".46" stopColor="#4E79E2" stopOpacity=".13" />
+            <stop offset="1" stopColor="#0A1E55" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="night-soul-logo-atmosphere" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="58">
+            <stop offset="0" stopColor="#B9CCFF" stopOpacity=".26" />
+            <stop offset=".48" stopColor="#5B83E8" stopOpacity=".17" />
+            <stop offset="1" stopColor="#0A1A4A" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="reference-stand-plinth" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#454847" />
+            <stop offset=".42" stopColor="#343738" />
+            <stop offset="1" stopColor="#292C2D" />
+          </linearGradient>
+          <linearGradient id="reference-stand-leg" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#393C3D" />
+            <stop offset=".58" stopColor="#333637" />
+            <stop offset="1" stopColor="#292C2D" />
+          </linearGradient>
           <mask id="cassette-reel-cutouts" maskUnits="userSpaceOnUse" x="-160" y="-100" width="320" height="220">
             <rect x="-160" y="-100" width="320" height="220" fill="white" />
             <circle cx={-CASSETTE_SPEC.reelCenterX} cy="0" r={CASSETTE_SPEC.reelHoleRadius} fill="black" />
             <circle cx={CASSETTE_SPEC.reelCenterX} cy="0" r={CASSETTE_SPEC.reelHoleRadius} fill="black" />
+          </mask>
+          <clipPath id="cathedral-dust-body-clip" clipPathUnits="userSpaceOnUse">
+            <rect
+              x={CASSETTE_VISUAL_TOKENS.cathedralReference.bodyClip.x}
+              y={CASSETTE_VISUAL_TOKENS.cathedralReference.bodyClip.y}
+              width={CASSETTE_VISUAL_TOKENS.cathedralReference.bodyClip.width}
+              height={CASSETTE_VISUAL_TOKENS.cathedralReference.bodyClip.height}
+              rx={CASSETTE_VISUAL_TOKENS.cathedralReference.bodyClip.rx}
+            />
+          </clipPath>
+          <mask id="night-soul-core-window-cutouts" maskUnits="userSpaceOnUse" x="-60" y="-30" width="120" height="60">
+            <rect x="-60" y="-30" width="120" height="60" fill="black" />
+            <rect x="-51" y="-20" width="102" height="40" rx="4" fill="white" />
+            <circle cx="-65" cy="0" r={CASSETTE_VISUAL_TOKENS.signalReference.reelOuterRadius} fill="black" />
+            <circle cx="65" cy="0" r={CASSETTE_VISUAL_TOKENS.signalReference.reelOuterRadius} fill="black" />
           </mask>
           <clipPath id="bay-cavity-clip">
             <path d={`M${INTAKE.cavity.left} ${INTAKE.cavity.bottom}H${INTAKE.cavity.right}L${INTAKE.cavity.rearRight} ${INTAKE.cavity.top}H${INTAKE.cavity.rearLeft}Z`} />
@@ -2016,6 +3079,20 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
             <circle cx="1.7" cy="2.2" r=".46" fill="#FFF9EE" opacity=".34" />
             <circle cx="6.4" cy="5.7" r=".38" fill="#777871" opacity=".2" />
             <circle cx="3.3" cy="8.1" r=".28" fill="#6B6C66" opacity=".15" />
+          </pattern>
+          <pattern id="night-soul-print-distress-pattern" width="64" height="64" patternUnits="userSpaceOnUse">
+            <image href="/assets/night-soul/ref-v2/print-distress-mask.png" x="0" y="0" width="64" height="64" preserveAspectRatio="xMidYMid meet" />
+          </pattern>
+          <mask id="night-soul-print-distress-full-mask" maskUnits="userSpaceOnUse" x="-140" y="-80" width="280" height="156">
+            <rect x="-140" y="-80" width="280" height="156" fill="white" />
+            <rect x="-140" y="-80" width="280" height="156" fill="url(#night-soul-print-distress-pattern)" />
+          </mask>
+          <mask id="night-soul-print-distress-soft-mask" maskUnits="userSpaceOnUse" x="-140" y="-80" width="280" height="156">
+            <rect x="-140" y="-80" width="280" height="156" fill="white" />
+            <rect x="-140" y="-80" width="280" height="156" fill="url(#night-soul-print-distress-pattern)" opacity=".35" />
+          </mask>
+          <pattern id="night-soul-global-grain" width="64" height="64" patternUnits="userSpaceOnUse">
+            <image href="/assets/night-soul/ref-v2/global-grain.png" x="0" y="0" width="64" height="64" preserveAspectRatio="xMidYMid meet" />
           </pattern>
         </defs>
         <g className="graphic-stage__world" transform={WORLD_TO_DESIGN}>
@@ -2127,6 +3204,8 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
               >
                 <CassetteGraphic
                   tape={tape}
+                  playing={isPlaying && activeTrackId === tape.trackId}
+                  reducedMotion={reducedMotion}
                   holding={phase === DECK_PHASE.DRAGGING && selectedId === tape.id}
                   onPointerDown={(event) => handlePointerDown(event, tape.id)}
                   onKeyDown={(event) => handleTapeKeyDown(event, tape.id)}
@@ -2161,7 +3240,12 @@ export default function GraphicDeckStage({ frontMode = 'legacy' }) {
               key={`eject-exterior-${tape.id}`}
               className="graphic-layer graphic-layer--cassette-eject-foreground"
             >
-              <CassetteGraphic tape={tape} interactive={false} />
+              <CassetteGraphic
+                tape={tape}
+                interactive={false}
+                playing={isPlaying && activeTrackId === tape.trackId}
+                reducedMotion={reducedMotion}
+              />
             </g>
           ))}
         </g>

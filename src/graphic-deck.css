@@ -17,8 +17,8 @@
   isolation: isolate;
   background: var(--color-canvas);
   background-image:
-    linear-gradient(to right, rgb(200 63 46 / .55) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(200 63 46 / .55) 1px, transparent 1px);
+    linear-gradient(to right, rgb(179 55 42 / .58) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(179 55 42 / .58) 1px, transparent 1px);
   background-size: 38px 38px;
   -webkit-font-smoothing: antialiased;
   touch-action: none;
@@ -100,9 +100,18 @@
   transform-origin: center;
 }
 
+.graphic-tape-reel-gear.is-playing {
+  animation: cassette-signal-reel-spin 1.8s linear infinite;
+}
+
 @keyframes cassette-idle-drift {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
+}
+
+@keyframes cassette-signal-reel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .graphic-stage:not([data-phase="standby"]) .graphic-tape-idle-drift {
@@ -155,6 +164,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .graphic-tape-idle-drift { animation: none; }
+  .graphic-tape-reel-gear.is-playing { animation: none; }
   .graphic-intake-hint__arrow {
     animation: none;
     opacity: .72;

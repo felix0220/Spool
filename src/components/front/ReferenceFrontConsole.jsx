@@ -906,14 +906,22 @@ function ReferenceFrontConsole({
         <clipPath id="reference-front-wave-progress-right" clipPathUnits="userSpaceOnUse">
           <rect x={waveformX} y={plot.y} width={waveformWidth * progress} height={plot.height} />
         </clipPath>
-        <pattern id="reference-front-brush" width="18" height="6" patternUnits="userSpaceOnUse">
-          <path d="M0 2H18" stroke="#FFFFFF" strokeWidth="1" opacity=".12" />
-          <path d="M0 5H18" stroke="#696B68" strokeWidth="1" opacity=".08" />
+        <pattern id="reference-front-brush" width="12" height="12" patternUnits="userSpaceOnUse">
+          <circle cx="2" cy="3" r=".55" fill="#FFFFFF" opacity=".16" />
+          <circle cx="9" cy="7" r=".45" fill="#777871" opacity=".09" />
+          <circle cx="5" cy="11" r=".35" fill="#FFFFFF" opacity=".11" />
         </pattern>
         <linearGradient id="reference-front-shell" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#F2F1EA" />
-          <stop offset=".48" stopColor="#ECEBE4" />
+          <stop offset=".42" stopColor="#ECEBE4" />
+          <stop offset=".82" stopColor="#E0DFD8" />
           <stop offset="1" stopColor="#D2D2CB" />
+        </linearGradient>
+        <linearGradient id="reference-front-molded-lip" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#C5C5BE" />
+          <stop offset=".22" stopColor="#DBDAD3" />
+          <stop offset=".78" stopColor="#F4F3EC" />
+          <stop offset="1" stopColor="#D0CFC8" />
         </linearGradient>
         <linearGradient id="reference-front-fascia" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#F0EFE8" />
@@ -950,15 +958,40 @@ function ReferenceFrontConsole({
       <g className="reference-front__physical-body">
         <rect className="reference-front__body-contact-shadow" x={G.chassis.x} y={G.chassis.y} width={G.chassis.width} height={G.chassis.height} rx={G.chassis.radius} fill="#111315" opacity=".14" transform="translate(0 5)" filter="url(#reference-front-shell-shadow)" />
         <rect className="reference-front__body-shell" x={G.chassis.x} y={G.chassis.y} width={G.chassis.width} height={G.chassis.height} rx={G.chassis.radius} fill="url(#reference-front-shell)" stroke="#B7B6B0" strokeWidth="4" />
-        <rect className="reference-front__body-inset" x={G.chassis.inner.x} y={G.chassis.inner.y} width={G.chassis.inner.width} height={G.chassis.inner.height} rx={G.chassis.inner.radius} fill={C.body} stroke="#A8A9A3" strokeWidth="2" />
+        <rect
+          className="reference-front__body-molded-lip"
+          x={G.chassis.inner.x - worldLength(7)}
+          y={G.chassis.inner.y - worldLength(7)}
+          width={G.chassis.inner.width + worldLength(14)}
+          height={G.chassis.inner.height + worldLength(14)}
+          rx={G.chassis.inner.radius + worldLength(7)}
+          fill="url(#reference-front-molded-lip)"
+        />
+        <rect className="reference-front__body-inset" x={G.chassis.inner.x} y={G.chassis.inner.y} width={G.chassis.inner.width} height={G.chassis.inner.height} rx={G.chassis.inner.radius} fill={C.body} />
         <rect className="reference-front__body-brush" x={G.chassis.inner.x} y={G.chassis.inner.y} width={G.chassis.inner.width} height={G.chassis.inner.height} rx={G.chassis.inner.radius} fill="url(#reference-front-brush)" opacity=".32" pointerEvents="none" />
       </g>
       {G.screwCenters.map(([cx, cy]) => <Screw key={`${cx}-${cy}`} cx={cx} cy={cy} />)}
 
       <g className="reference-front__screen-zone" data-screen-zone="signal-workspace">
-        <rect className="reference-front__screen-well" x={G.upper.x} y={G.upper.y} width={G.upper.width} height={G.upper.height} rx={G.upper.radius} fill="#000" stroke="var(--take-hair)" strokeWidth="1" />
+        <rect
+          className="reference-front__screen-pocket"
+          x={G.upper.x - worldLength(5)}
+          y={G.upper.y - worldLength(5)}
+          width={G.upper.width + worldLength(10)}
+          height={G.upper.height + worldLength(10)}
+          rx={G.upper.radius + worldLength(5)}
+        />
+        <rect className="reference-front__screen-well" x={G.upper.x} y={G.upper.y} width={G.upper.width} height={G.upper.height} rx={G.upper.radius} fill="url(#reference-front-screen)" stroke="var(--take-hair)" strokeWidth="1" />
       </g>
       <g className="reference-front__lower-fascia">
+        <rect
+          className="reference-front__fascia-pocket"
+          x={G.lower.x - worldLength(4)}
+          y={G.lower.y - worldLength(4)}
+          width={G.lower.width + worldLength(8)}
+          height={G.lower.height + worldLength(8)}
+          rx={G.lower.radius + worldLength(4)}
+        />
         <rect className="reference-front__fascia-surface" x={G.lower.x} y={G.lower.y} width={G.lower.width} height={G.lower.height} rx={G.lower.radius} fill="url(#reference-front-fascia)" stroke="#B7B6B0" strokeWidth="1.5" />
         <path className="reference-front__fascia-highlight" d={`M${G.lower.x + 14} ${G.lower.y + 2}H${G.lower.x + G.lower.width - 14}`} stroke="#FAF9F2" strokeWidth="1" opacity=".72" />
       </g>

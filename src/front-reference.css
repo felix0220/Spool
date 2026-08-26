@@ -59,10 +59,13 @@
 }
 
 .reference-front__body-shell,
+.reference-front__body-molded-lip,
 .reference-front__body-inset,
 .reference-front__body-brush,
+.reference-front__screen-pocket,
 .reference-front__screen-well,
 .reference-front__screen-grid,
+.reference-front__fascia-pocket,
 .reference-front__fascia-surface,
 .reference-front__fascia-highlight,
 .reference-front__screw-ring,
@@ -73,9 +76,18 @@
 }
 
 .reference-front__body-shell { stroke: var(--front-seam-soft); }
-.reference-front__body-inset { stroke: color-mix(in oklch, var(--front-seam-soft) 78%, black); }
-.reference-front__body-brush { opacity: .3; }
+.reference-front__body-molded-lip { stroke: none; }
+.reference-front__body-inset { stroke: none; }
+.reference-front__body-brush { opacity: .22; }
+.reference-front__screen-pocket {
+  fill: #303235;
+  stroke: none;
+}
 .reference-front__screen-well { stroke: var(--front-seam-screen); }
+.reference-front__fascia-pocket {
+  fill: color-mix(in oklch, var(--front-seam-soft) 72%, var(--front-paper));
+  stroke: none;
+}
 .reference-front__fascia-surface { stroke: var(--front-seam-soft); }
 .reference-front__fascia-highlight { fill: none; }
 .reference-front__screw-ring { stroke: color-mix(in oklch, var(--front-seam-soft) 72%, black); }
@@ -141,7 +153,7 @@
 }
 
 .reference-front__screen-well {
-  fill: #000;
+  fill: url(#reference-front-screen);
   stroke: var(--take-hair);
   stroke-width: 1;
 }

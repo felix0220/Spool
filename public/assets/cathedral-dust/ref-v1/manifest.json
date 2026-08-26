@@ -1,0 +1,645 @@
+{
+  "version": "1.0",
+  "task": "Task 00 \u2014 Baseline and authority lock",
+  "sourceOfTruth": {
+    "path": "/Users/fuyang/.codex/generated_images/01a01306-6710-7bf0-b2cb-79fc36ce1d69/exec-5c02149d-b766-4be0-9e8d-9eaae2a34451.png",
+    "pixelWidth": 1463,
+    "pixelHeight": 1075,
+    "sha256": "c0a1bb096f555df3bc365014cf49186363752d063ffe2b36d58d847341b41ffe"
+  },
+  "mapping": {
+    "cassetteId": "cream",
+    "variant": "paper",
+    "artVariant": "cathedral-ribs",
+    "trackId": "cathedral-dust",
+    "title": "Cathedral Dust",
+    "slot": 3
+  },
+  "latestApprovedDelta": {
+    "name": "Cathedral Dust lower-right edition engraving",
+    "status": "implemented",
+    "generatedOn": "2026-08-25",
+    "asset": {
+      "path": "public/assets/cathedral-dust/ref-v1/edition-03-engraving.png",
+      "width": 112,
+      "height": 64,
+      "mode": "RGBA",
+      "sha256": "6c111a5ae6fcdcb1685f9ccd5dcc2259edf0d97a9909934a7e498ef2ca09b096",
+      "alpha": true,
+      "alphaBounds": [19, 8, 101, 53]
+    },
+    "runtime": {
+      "component": "src/components/GraphicDeckStage.jsx::CathedralDustArtwork",
+      "layer": "edition-03-engraving",
+      "box": { "x": 101, "y": 22, "width": 28, "height": 16 },
+      "filter": "cathedral-engraving-emboss",
+      "opacity": 0.92,
+      "parentTransform": "graphic-tape-entity"
+    }
+  },
+  "frozenGeometry": {
+    "width": 280,
+    "height": 156,
+    "reelCenters": [
+      -65,
+      65
+    ],
+    "receiverHoleRadius": 20
+  },
+  "capture": {
+    "viewport": {
+      "width": 1440,
+      "height": 1017
+    },
+    "url": "http://127.0.0.1:4178/?front=reference",
+    "states": [
+      {
+        "id": "home",
+        "file": "artifacts/cathedral-dust/task-00/01-home.png",
+        "sha256": "b789de790900b9e702ec8095d72037dff8db76d84d122ebbb17a9d40ecd1384b",
+        "lapseSpeed": 1,
+        "state": {
+          "phase": "standby",
+          "view": 0,
+          "bayOpen": 0,
+          "embed": 0,
+          "lock": 0
+        }
+      },
+      {
+        "id": "pointer-held",
+        "file": "artifacts/cathedral-dust/task-00/02-pointer-held.png",
+        "sha256": "66082158abaa2c0e2cee3663a74f3a9907d4daf514593a1f350ed2a959262e0f",
+        "lapseSpeed": 0.25,
+        "state": {
+          "phase": "dragging",
+          "view": 0,
+          "bayOpen": 0,
+          "embed": 0,
+          "lock": 0
+        }
+      },
+      {
+        "id": "entering-bay",
+        "file": "artifacts/cathedral-dust/task-00/03-entering-bay.png",
+        "sha256": "ca922dda5deb3f53bc5cba2984feb837c9020770ec25c568e3633d0f4dcbdf7f",
+        "lapseSpeed": 0.25,
+        "state": {
+          "phase": "loading",
+          "view": 0,
+          "bayOpen": 0.4409793929847501,
+          "embed": 0,
+          "lock": 0
+        }
+      },
+      {
+        "id": "seated-in-bay",
+        "file": "artifacts/cathedral-dust/task-00/04-seated-in-bay.png",
+        "sha256": "1682e2ec4a4267c6faa9b8c4569466d78319020b1377e601267734c29a172462",
+        "lapseSpeed": 0.25,
+        "state": {
+          "phase": "ejecting",
+          "view": 0,
+          "bayOpen": 0.322004183385875,
+          "embed": 1,
+          "lock": 1
+        },
+        "note": "Captured on the first eject frame while the cassette remained fully seated and locked; this records existing seated geometry only."
+      },
+      {
+        "id": "ejecting",
+        "file": "artifacts/cathedral-dust/task-00/05-ejecting.png",
+        "sha256": "c85c0f8196dfd6e83c6bad6348e2070147ef9cc3706d6e68b5d9cc8a48f47c3e",
+        "lapseSpeed": 1,
+        "state": {
+          "phase": "ejecting",
+          "view": 0,
+          "bayOpen": 1,
+          "embed": 0.945858161383464,
+          "lock": 0
+        }
+      }
+    ]
+  },
+  "ownership": [
+    {
+      "concern": "runtime entry",
+      "file": "src/App.jsx",
+      "owner": "GraphicDeckStage"
+    },
+    {
+      "concern": "shared cassette geometry and lifecycle",
+      "file": "src/components/GraphicDeckStage.jsx",
+      "owner": "CASSETTE_SPEC and GraphicDeckStage state machine"
+    },
+    {
+      "concern": "current Cathedral Dust visual branch",
+      "file": "src/components/GraphicDeckStage.jsx",
+      "owner": "CassetteGraphic Cathedral Dust branch with temporary paper fallback"
+    },
+    {
+      "concern": "audio mapping and metadata",
+      "file": "src/music/tracks.js",
+      "owner": "TRACK_LIBRARY cathedral-dust entry"
+    },
+    {
+      "concern": "future Cathedral Dust asset package",
+      "file": "public/assets/cathedral-dust/ref-v1/",
+      "owner": "Task 01 and later"
+    }
+  ],
+  "gate00": {
+    "referenceHashMatches": true,
+    "fiveStatesExist": true,
+    "fixedViewport": true,
+    "geometryLocked": true,
+    "ownershipUnambiguous": true
+  },
+  "task01": {
+    "status": "pending-human-visual-signoff",
+    "master": {
+      "path": "public/assets/cathedral-dust/ref-v1/production-master.png",
+      "width": 1120,
+      "height": 624,
+      "sha256": "74c7eecaa82d8e61bcd2e3c2dde5cc86344f743eeec63da9aa2e63e0452e0d76",
+      "alpha": true
+    },
+    "anchors": {
+      "leftHole": {
+        "x": 300,
+        "y": 312,
+        "radius": 80
+      },
+      "rightHole": {
+        "x": 820,
+        "y": 312,
+        "radius": 80
+      }
+    },
+    "proof": "artifacts/cathedral-dust/task-01/production-master-geometry-proof.png",
+    "comparison": "artifacts/cathedral-dust/task-01/source-to-master-comparison.png",
+    "sourceHashVerified": "c0a1bb096f555df3bc365014cf49186363752d063ffe2b36d58d847341b41ffe",
+    "generatedOn": "2026-08-25",
+    "runtimeIntegration": "blocked-until-gate-01"
+  },
+  "task02": {
+    "status": "passed",
+    "sourceHashVerified": "c0a1bb096f555df3bc365014cf49186363752d063ffe2b36d58d847341b41ffe",
+    "masterHash": "74c7eecaa82d8e61bcd2e3c2dde5cc86344f743eeec63da9aa2e63e0452e0d76",
+    "generatedOn": "2026-08-25",
+    "master": {
+      "path": "public/assets/cathedral-dust/ref-v1/production-master.png",
+      "width": 1120,
+      "height": 624
+    },
+    "layerOrder": [
+      "rear-media.png",
+      "lower-mechanism.png",
+      "shell-substrate.png",
+      "reel-left-surface.png",
+      "reel-right-surface.png",
+      "title-engraving.png",
+      "official-SPOOL-mark-vector",
+      "brass-fastener.png",
+      "surface-wear.png"
+    ],
+    "runtimeComponent": "src/components/GraphicDeckStage.jsx::CassetteGraphic",
+    "blendRules": {
+      "shell-substrate.png": {
+        "opacity": 1,
+        "blendMode": "normal"
+      },
+      "rear-media.png": {
+        "opacity": 1,
+        "blendMode": "normal"
+      },
+      "lower-mechanism.png": {
+        "opacity": 1,
+        "blendMode": "normal"
+      },
+      "surface-wear.png": {
+        "opacity": 0.72,
+        "blendMode": "soft-light"
+      },
+      "title-engraving.png": {
+        "opacity": 0.94,
+        "blendMode": "normal"
+      },
+      "brass-fastener.png": {
+        "opacity": 1,
+        "blendMode": "normal"
+    }
+  },
+    "assets": {
+      "shell-substrate.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/shell-substrate.png",
+        "width": 1120,
+        "height": 624,
+        "mode": "RGBA",
+        "sha256": "31b3ccc9ed0f5fff35a00a570bdceb1c70d9d17faba55ef015a22db6a185d142",
+        "alpha": true,
+        "alphaBounds": [
+          6,
+          7,
+          1113,
+          622
+        ]
+      },
+      "rear-media.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/rear-media.png",
+        "width": 1120,
+        "height": 624,
+        "mode": "RGBA",
+        "sha256": "fc0857a470c35574580c5168f93004e9a93a1fb40d7e19e067d81fbb414dc744",
+        "alpha": true,
+        "alphaBounds": [
+          75,
+          87,
+          525,
+          533
+        ]
+      },
+      "lower-mechanism.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/lower-mechanism.png",
+        "width": 1120,
+        "height": 624,
+        "mode": "RGBA",
+        "sha256": "6ab565e3c95149d194969e333a6129d64d46ba54f5d0024518752bbb9f1ac077",
+        "alpha": true,
+        "alphaBounds": [
+          226,
+          469,
+          894,
+          624
+        ]
+      },
+      "title-engraving.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/title-engraving.png",
+        "width": 651,
+        "height": 80,
+        "mode": "RGBA",
+        "sha256": "021f035708407e864501dd61ba1cbf27474c8abbe62a761ef5f9664d5ee64369",
+        "alpha": true,
+        "alphaBounds": [
+          4,
+          4,
+          647,
+          76
+        ]
+      },
+      "surface-wear.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/surface-wear.png",
+        "width": 1120,
+        "height": 624,
+        "mode": "RGBA",
+        "sha256": "bceca019ec955994894e84fb115fc97d1e79a11bc315b0535b758c8dcc67e455",
+        "alpha": true,
+        "alphaBounds": [
+          5,
+          6,
+          1115,
+          624
+        ]
+      },
+      "reel-left-surface.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/reel-left-surface.png",
+        "width": 224,
+        "height": 224,
+        "mode": "RGBA",
+        "sha256": "510b7d0498bbab1e911cb09c6245b53f4431da054212f127fd94ee2723a918b5",
+        "alpha": true,
+        "alphaBounds": [
+          14,
+          14,
+          210,
+          210
+        ]
+      },
+      "reel-right-surface.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/reel-right-surface.png",
+        "width": 224,
+        "height": 224,
+        "mode": "RGBA",
+        "sha256": "d9f54a3ffbb5b4a0c7e4043fd047df2ac6becdf8a3053d881d29fe3811d60d78",
+        "alpha": true,
+        "alphaBounds": [
+          14,
+          14,
+          210,
+          210
+        ]
+      },
+      "brass-fastener.png": {
+        "path": "public/assets/cathedral-dust/ref-v1/brass-fastener.png",
+        "width": 64,
+        "height": 64,
+        "mode": "RGBA",
+        "sha256": "438b5dbd7ede6bb9139701cb5a35393621162b2d0580af5fd9856160e32a8d38",
+        "alpha": true,
+        "alphaBounds": [
+          4,
+          5,
+          60,
+          60
+        ]
+      }
+    },
+    "pivotLocal": {
+      "reel-left-surface.png": {
+        "productionCenter": {
+          "x": 300,
+          "y": 312
+        },
+        "cropSize": 224,
+        "pivot": {
+          "x": 112,
+          "y": 112
+        },
+        "runtimeCenter": {
+          "x": -65,
+          "y": 0
+        },
+        "runtimeSize": 56
+      },
+      "reel-right-surface.png": {
+        "productionCenter": {
+          "x": 820,
+          "y": 312
+        },
+        "cropSize": 224,
+        "pivot": {
+          "x": 112,
+          "y": 112
+        },
+        "runtimeCenter": {
+          "x": 65,
+          "y": 0
+        },
+        "runtimeSize": 56
+      }
+    },
+    "title": {
+      "productionBounds": [
+        88,
+        88,
+        742,
+        154
+      ],
+      "assetOrigin": {
+        "x": 83,
+        "y": 81
+      },
+      "assetSize": [
+        651,
+        80
+      ],
+      "runtimeScale": 0.25
+    },
+    "fasteners": [
+      {
+        "x": 38,
+        "y": 36,
+        "runtimeX": -130.5,
+        "runtimeY": -69.0
+      },
+      {
+        "x": 1082,
+        "y": 36,
+        "runtimeX": 130.5,
+        "runtimeY": -69.0
+      },
+      {
+        "x": 38,
+        "y": 588,
+        "runtimeX": -130.5,
+        "runtimeY": 69.0
+      },
+      {
+        "x": 1082,
+        "y": 588,
+        "runtimeX": 130.5,
+        "runtimeY": 69.0
+      },
+      {
+        "x": 560,
+        "y": 520,
+        "runtimeX": 0.0,
+        "runtimeY": 52.0
+      }
+    ],
+    "runtimeIntegration": "blocked-until-task03"
+  },
+  "task03": {
+    "status": "passed",
+    "generatedOn": "2026-08-25",
+    "runtimeComponent": "src/components/GraphicDeckStage.jsx::CathedralDustArtwork",
+    "identityPredicate": "tape.id === 'cream' && tape.trackId === 'cathedral-dust'",
+    "parentTransformOwner": "graphic-tape-entity",
+    "diagnosticHooks": {
+      "art": "cathedral-dust-ref-v1",
+      "layers": [
+        "rear-media",
+        "lower-mechanism",
+        "shell-substrate",
+        "reel-left-surface",
+        "reel-right-surface",
+        "title-engraving",
+        "official-SPOOL-mark-vector",
+        "brass-fastener",
+        "surface-wear"
+      ]
+    },
+    "verification": {
+      "structuralTests": "passed",
+      "fullTests": "121 passed",
+      "sitesTests": "4 passed",
+      "build": "passed",
+      "browserHomeScreenshot": {
+        "path": "artifacts/cathedral-dust/task-03/front-home.png",
+        "sha256": "bb62f5f8630bb5a45d075c7368a0593f4fd0cfbcd835acc0c600c10037c870fa"
+      }
+    },
+    "gate03": {
+      "sharedTransformPreserved": true,
+      "sharedLifecyclePreserved": true,
+      "noArtworkPointerHandlers": true,
+      "homeObservabilityPreserved": true,
+      "temporaryPaperFallbackRetained": true
+    },
+    "next": "task04-asset-stack-and-hole-opacity-integration"
+  },
+  "task04": {
+    "status": "passed",
+    "generatedOn": "2026-08-25",
+    "runtimeComponent": "src/components/GraphicDeckStage.jsx::CathedralDustArtwork",
+    "composition": {
+      "rearMedia": "public/assets/cathedral-dust/ref-v1/rear-media.png",
+      "shell": "public/assets/cathedral-dust/ref-v1/shell-substrate.png",
+      "mapping": "uniform 0.25 scale from 1120x624 to 280x156",
+      "bodyClip": {
+        "x": -140,
+        "y": -78,
+        "width": 280,
+        "height": 156,
+        "rx": 11
+      },
+      "receiverHoleMask": "cassette-reel-cutouts"
+    },
+    "verification": {
+      "structuralTests": "passed",
+      "fullTests": "121 passed",
+      "build": "passed",
+      "sitesTests": "4 passed",
+      "browserHomeScreenshot": {
+        "path": "artifacts/cathedral-dust/task-04/front-home.png",
+        "sha256": "86aed68f42b514ff7cde03a6436f56243ee53bd09853cb33d312cfedc6d6c76a"
+      },
+      "runtimeAssetHttp": "all required Task02 Cathedral PNGs returned 200"
+    },
+    "gate04": {
+      "translucentObjectRead": true,
+      "mediaBehindShell": true,
+      "receiverHolesRemainOpen": true,
+      "bodyClipPresent": true,
+      "shadowAndHoldRingUnchanged": true
+    },
+    "next": "task05-reel-hardware-lower-mechanism-and-fasteners"
+  },
+  "task05": {
+    "status": "passed",
+    "generatedOn": "2026-08-25",
+    "runtimeComponent": "src/components/GraphicDeckStage.jsx::CathedralDustArtwork",
+    "mechanicalLayers": {
+      "reelLeft": {
+        "center": [-65, 0],
+        "rotationOwner": "CassetteGraphic reelTurn",
+        "transform": "translate(-65 0) rotate(reelTurn * -1)"
+      },
+      "reelRight": {
+        "center": [65, 0],
+        "rotationOwner": "CassetteGraphic reelTurn",
+        "transform": "translate(65 0) rotate(reelTurn)"
+      },
+      "lowerMechanism": "public/assets/cathedral-dust/ref-v1/lower-mechanism.png",
+      "fastener": "public/assets/cathedral-dust/ref-v1/brass-fastener.png",
+      "fastenerRuntimeAnchors": [
+        [-130.5, -69],
+        [130.5, -69],
+        [-130.5, 69],
+        [130.5, 69],
+        [0, 52]
+      ]
+    },
+    "verification": {
+      "structuralTests": "passed",
+      "fullTests": "122 passed",
+      "build": "passed",
+      "browserHomeScreenshot": {
+        "path": "artifacts/cathedral-dust/task-05/front-home.png",
+        "sha256": "f44d1ea523c593cb8e23d0738ae038663f8636f5f135f8fcecdc723c12372c77"
+      },
+      "domEvidence": {
+        "bodyClip": "url(#cathedral-dust-body-clip)",
+        "receiverHoleMask": "url(#cassette-reel-cutouts)",
+        "reelMotionGroups": 2,
+        "fasteners": 5
+      }
+    },
+    "gate05": {
+      "receiverCentersPreserved": true,
+      "rotationOwnerPreserved": true,
+      "fastenersInsideBody": true,
+      "lowerMechanismBehindFrontHardware": true
+    },
+    "next": "task06-engraved-title-and-official-spool-mark"
+  },
+  "task06": {
+    "status": "passed",
+    "generatedOn": "2026-08-25",
+    "runtimeComponent": "src/components/GraphicDeckStage.jsx::CathedralDustArtwork",
+    "engraving": {
+      "titleAsset": "public/assets/cathedral-dust/ref-v1/title-engraving.png",
+      "titleBox": {
+        "x": -119.25,
+        "y": -57.75,
+        "width": 162.75,
+        "height": 20
+      },
+      "officialMarkAsset": "/mark.svg",
+      "officialMarkBox": {
+        "x": 93,
+        "y": -61,
+        "width": 24,
+        "height": 24
+      },
+      "filter": "cathedral-engraving-emboss",
+      "opacity": {
+        "title": 0.92,
+        "mark": 0.74
+      }
+    },
+    "verification": {
+      "structuralTests": "passed",
+      "fullTests": "122 passed",
+      "sitesTests": "4 passed",
+      "build": "passed",
+      "browserHomeScreenshot": {
+        "path": "artifacts/cathedral-dust/task-06/front-home.png",
+        "sha256": "7b3c61f6cb27f86f14303c30dad6be8f5f19c6d349c78bd7b8e5b762c9c8e3a3"
+      },
+      "comparison": "artifacts/cathedral-dust/task-06/source-implementation-comparison.png",
+      "domEvidence": {
+        "titleFilter": "url(#cathedral-engraving-emboss)",
+        "markFilter": "url(#cathedral-engraving-emboss)",
+        "officialMarkSource": "/mark.svg"
+      }
+    },
+    "gate06": {
+      "titleUsesReferenceHandwriting": true,
+      "officialMarkUsesExactAsset": true,
+      "singleLogicalMark": true,
+      "engravingDepthApplied": true,
+      "reelHoleClearancePreserved": true
+    },
+    "next": "task07-surface-wear-and-material-polish"
+  },
+  "task07": {
+    "status": "passed",
+    "generatedOn": "2026-08-25",
+    "runtimeComponent": "src/components/GraphicDeckStage.jsx::CathedralDustArtwork",
+    "surfaceWear": {
+      "asset": "public/assets/cathedral-dust/ref-v1/surface-wear.png",
+      "opacity": 0.34,
+      "blendMode": "soft-light",
+      "layerPosition": "above shell-substrate and below reel/title/mark/fastener hardware",
+      "clip": "url(#cathedral-dust-body-clip)"
+    },
+    "verification": {
+      "structuralTests": "passed",
+      "fullTests": "122 passed",
+      "sitesTests": "4 passed",
+      "build": "passed",
+      "browserHomeScreenshot": {
+        "path": "artifacts/cathedral-dust/task-07/front-home.png",
+        "sha256": "9d5a368ce5b5564290fa7cb6737e0e771999e94c2cf93a5c3db529f5d3571d72"
+      },
+      "backgroundAudit": "artifacts/cathedral-dust/task-07/source-implementation-background-audit.png",
+      "backgroundsReviewed": ["coral", "black", "neutral"],
+      "domEvidence": {
+        "wearOpacity": "0.34",
+        "wearBlendMode": "soft-light",
+        "wearIndex": 3,
+        "reelIndex": 4,
+        "titleIndex": 6
+      }
+    },
+    "gate07": {
+      "depthVisibleAtLandingScale": true,
+      "wearDoesNotCompeteWithIdentity": true,
+      "materialRemainsWarmIvory": true,
+      "noNewBodyShadowHalo": true,
+      "hardwareRemainsReadable": true
+    },
+    "next": "task08-lifecycle-and-motion-integrity"
+  }
+}

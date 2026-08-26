@@ -201,7 +201,7 @@ function BrandPlaque({ quad, depth }) {
   );
 }
 
-export function TopSurfaceDetails({ panel, top, opacity = 1 }) {
+export function TopSurfaceDetails({ panel, top, panelPath, opacity = 1 }) {
   if (!panel || !top) return null;
   const depth = Math.max(.22, Math.min(1, Math.abs(panel[0][1] - panel[3][1]) / 268));
   return (
@@ -210,12 +210,21 @@ export function TopSurfaceDetails({ panel, top, opacity = 1 }) {
       opacity={opacity}
       pointerEvents="none"
     >
-      <polygon
-        className="industrial-plastic-grain"
-        points={polygonString(panel)}
-        fill="url(#industrial-plastic-grain)"
-        opacity=".1"
-      />
+      {panelPath ? (
+        <path
+          className="industrial-plastic-grain"
+          d={panelPath}
+          fill="url(#industrial-plastic-grain)"
+          opacity=".1"
+        />
+      ) : (
+        <polygon
+          className="industrial-plastic-grain"
+          points={polygonString(panel)}
+          fill="url(#industrial-plastic-grain)"
+          opacity=".1"
+        />
+      )}
       <g opacity=".92">
         <VentBank
           quad={panel}

@@ -41,6 +41,8 @@ test('Tone keeps a persistent gray track and reveals its orange progress after i
   assert.match(source, /aria-label=\{label\}/);
   assert.match(source, /data-value-feedback=\{hasValueFeedback \? 'visible' : 'hidden'\}/);
   assert.match(source, /tone-dial-progress/);
+  assert.match(source, /data-progress-visible=\{normalizedValue > 0 \? 'visible' : 'hidden'\}/);
+  assert.doesNotMatch(source, /data-progress-visible=\{controlKind === 'tone-dial'/);
   assert.match(css, /\.reference-front__tone-dial-track\s*\{[\s\S]*stroke:\s*#b7b7b0/);
   assert.match(css, /\.reference-front__tone-dial-progress\s*\{[\s\S]*stroke:\s*var\(--dial-accent, var\(--front-orange\)\)/);
   assert.match(css, /\.reference-front__tone-dial\[data-progress-visible='visible'\] \.reference-front__tone-dial-progress/);
@@ -50,10 +52,12 @@ test('Tone keeps a persistent gray track and reveals its orange progress after i
   assert.doesNotMatch(css, /\.reference-front__tone-dial[^\n{]*\{[^}]*transform:/s);
 });
 
-test('Tone starts at the left endpoint in the audio state', () => {
+test('Tone starts neutral before the first cassette insertion', () => {
   const source = fs.readFileSync(new URL('../src/components/GraphicDeckStage.jsx', import.meta.url), 'utf8');
   assert.match(source, /const \[toneCutoff, setToneCutoff\] = useState\(400\)/);
-  assert.match(source, /setToneCutoff\(400\)/);
+  assert.match(source, /const \[spaceAmount, setSpaceAmount\] = useState\(0\)/);
+  assert.match(source, /const \[textureAmount, setTextureAmount\] = useState\(0\)/);
+  assert.match(source, /setToneCutoff\(tapeVariation\.toneCutoff\)/);
 });
 
 test('Tone marker is positioned on the knob face, not on the outer track', () => {
